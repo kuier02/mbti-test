@@ -1959,7 +1959,7 @@ function submitToFeishu(btn) {
     "年龄段": last.age || '',
     "测试时间": dateStr,
     "人格类型": last.type,
-    "人格名称": last.typeName || '',
+    "人格名称": (last.typeName || '') + (last.nickname ? ' - ' + last.nickname.replace(/ · /g, '，') : ''),
     "用时_分钟": last.duration || 0,
     "E分值": last.E || 0,
     "I分值": last.I || 0,
