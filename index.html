@@ -1,0 +1,1998 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBTI 职场性格测评系统</title>
+<style>
+  :root {
+    --primary: #4F46E5;
+    --primary-light: #6366F1;
+    --primary-bg: #EEF2FF;
+    --accent: #06B6D4;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --dark: #1E1B4B;
+    --text: #374151;
+    --text-light: #6B7280;
+    --border: #E5E7EB;
+    --bg: #F9FAFB;
+    --white: #FFFFFF;
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: var(--text);
+  }
+
+  .app-container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* ===== 欢迎页 ===== */
+  .welcome-screen {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 50px 40px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    margin-top: 30px;
+  }
+
+  .welcome-logo {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 42px;
+  }
+
+  .welcome-screen h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 8px;
+  }
+
+  .welcome-screen .subtitle {
+    font-size: 16px;
+    color: var(--text-light);
+    margin-bottom: 32px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+
+  .feature-card {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 20px 16px;
+    text-align: center;
+  }
+
+  .feature-icon { font-size: 28px; margin-bottom: 8px; }
+
+  .feature-card h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 4px;
+  }
+
+  .feature-card p {
+    font-size: 12px;
+    color: var(--text-light);
+    line-height: 1.5;
+  }
+
+  .info-box {
+    background: var(--primary-bg);
+    border-left: 4px solid var(--primary);
+    border-radius: 8px;
+    padding: 16px 20px;
+    text-align: left;
+    margin-bottom: 32px;
+  }
+
+  .info-box p {
+    font-size: 14px;
+    color: var(--dark);
+    line-height: 1.7;
+  }
+
+  /* 表单输入 */
+  .form-group {
+    margin-bottom: 16px;
+    text-align: left;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .form-group input, .form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    color: var(--text);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  .form-group input:focus, .form-group select:focus {
+    border-color: var(--primary);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* ===== 按钮 ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(79,70,229,0.4);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(79,70,229,0.5);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, var(--success) 0%, #34D399 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(16,185,129,0.4);
+  }
+
+  .btn-success:hover { transform: translateY(-2px); }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  /* ===== 测题页 ===== */
+  .test-screen {
+    display: none;
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    margin-top: 20px;
+    overflow: hidden;
+  }
+
+  .test-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    padding: 24px 32px;
+    color: white;
+  }
+
+  .test-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .test-header h2 { font-size: 18px; font-weight: 700; }
+
+  .progress-info {
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
+  .progress-bar-wrap {
+    background: rgba(255,255,255,0.2);
+    border-radius: 999px;
+    height: 8px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: white;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+
+  .dimension-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+
+  .test-body { padding: 32px; }
+
+  .question-number {
+    font-size: 13px;
+    color: var(--text-light);
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .question-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+
+  .options-container {
+    display: grid;
+    gap: 12px;
+  }
+
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg);
+    text-align: left;
+  }
+
+  .option-btn:hover {
+    border-color: var(--primary);
+    background: var(--primary-bg);
+    transform: translateX(4px);
+  }
+
+  .option-btn.selected {
+    border-color: var(--primary);
+    background: var(--primary-bg);
+  }
+
+  .option-letter {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--text-light);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .option-btn.selected .option-letter,
+  .option-btn:hover .option-letter {
+    background: var(--primary);
+    color: white;
+  }
+
+  .option-text {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .test-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ===== 加载页 ===== */
+  .loading-screen {
+    display: none;
+    background: var(--white);
+    border-radius: 20px;
+    padding: 60px 40px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    margin-top: 20px;
+  }
+
+  .loading-anim {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    position: relative;
+  }
+
+  .loading-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 4px solid transparent;
+    border-top-color: var(--primary);
+    animation: spin 1s linear infinite;
+  }
+
+  .loading-ring:nth-child(2) {
+    inset: 8px;
+    border-top-color: var(--accent);
+    animation-duration: 1.5s;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-screen h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 8px;
+  }
+
+  .loading-screen p {
+    color: var(--text-light);
+    font-size: 15px;
+  }
+
+  /* ===== 报告页 ===== */
+  .report-screen {
+    display: none;
+    margin-top: 20px;
+  }
+
+  .report-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    color: white;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .report-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  }
+
+  .report-hero-content { position: relative; }
+
+  .type-badge-large {
+    display: inline-block;
+    font-size: 52px;
+    font-weight: 900;
+    letter-spacing: 8px;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.2);
+  }
+
+  .type-name-large {
+    font-size: 24px;
+    font-weight: 700;
+    opacity: 0.95;
+    margin-bottom: 4px;
+  }
+
+  .type-nickname {
+    font-size: 16px;
+    opacity: 0.8;
+    margin-bottom: 20px;
+  }
+
+  .user-greeting {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 20px;
+  }
+
+  .dimension-scores {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .dim-score-card {
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 12px 8px;
+    backdrop-filter: blur(10px);
+  }
+
+  .dim-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    opacity: 0.8;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .dim-bar-wrap {
+    background: rgba(255,255,255,0.2);
+    border-radius: 999px;
+    height: 6px;
+    margin-bottom: 6px;
+    overflow: hidden;
+  }
+
+  .dim-bar-fill {
+    height: 100%;
+    background: white;
+    border-radius: 999px;
+    transition: width 1s ease;
+  }
+
+  .dim-selected {
+    font-size: 13px;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  /* 报告内容卡片 */
+  .report-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .report-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--bg);
+  }
+
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .report-card-header h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--dark);
+  }
+
+  /* 特质列表 */
+  .trait-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .trait-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--bg);
+  }
+
+  .trait-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .trait-item p {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  /* 弱点列表 */
+  .weakness-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .weakness-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border-left: 4px solid var(--warning);
+    background: #FFFBEB;
+  }
+
+  .weakness-item .wi-icon { font-size: 20px; }
+
+  .weakness-item .wi-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 2px;
+  }
+
+  .weakness-item .wi-desc {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.5;
+  }
+
+  /* 职业建议 */
+  .career-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .career-tag {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--primary-bg);
+    border: 1px solid #C7D2FE;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .career-advice-box {
+    background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+    border-radius: 12px;
+    padding: 16px 20px;
+    border-left: 4px solid var(--success);
+  }
+
+  .career-advice-box h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #065F46;
+    margin-bottom: 8px;
+  }
+
+  .career-advice-box p {
+    font-size: 14px;
+    color: #064E3B;
+    line-height: 1.7;
+  }
+
+  /* 兼容性 */
+  .compat-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .compat-box {
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .compat-box.best { background: #F0FDF4; border: 1px solid #86EFAC; }
+  .compat-box.worst { background: #FFF1F2; border: 1px solid #FECDD3; }
+
+  .compat-box h4 {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .compat-box.best h4 { color: #065F46; }
+  .compat-box.worst h4 { color: #9F1239; }
+
+  .compat-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .compat-type-tag {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .compat-box.best .compat-type-tag { background: #BBF7D0; color: #065F46; }
+  .compat-box.worst .compat-type-tag { background: #FECDD3; color: #9F1239; }
+
+  /* 成长建议 */
+  .growth-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .growth-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--bg);
+  }
+
+  .growth-num {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 13px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .growth-item p {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* 导出区 */
+  .export-section {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .export-section h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 8px;
+  }
+
+  .export-section p {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 20px;
+  }
+
+  .export-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .feishu-guide {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+  }
+
+  .feishu-guide h3 {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .step-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg);
+    border-radius: 10px;
+  }
+
+  .step-num {
+    width: 24px;
+    height: 24px;
+    background: var(--primary);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .step-item p {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* 浮动进度 */
+  .float-progress {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--white);
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: var(--shadow-lg);
+    font-size: 13px;
+    color: var(--text);
+    display: none;
+    align-items: center;
+    gap: 10px;
+    z-index: 100;
+  }
+
+  .float-progress.visible { display: flex; }
+
+  .float-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* 分组标题 */
+  .section-group-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    padding-left: 4px;
+  }
+
+  /* 描述文本 */
+  .desc-text {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.8;
+    padding: 12px 16px;
+    background: var(--bg);
+    border-radius: 10px;
+  }
+
+  @media (max-width: 600px) {
+    .features-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .dimension-scores { grid-template-columns: repeat(2, 1fr); }
+    .trait-list { grid-template-columns: 1fr; }
+    .career-grid { grid-template-columns: repeat(2, 1fr); }
+    .compat-section { grid-template-columns: 1fr; }
+    .export-buttons { flex-direction: column; align-items: center; }
+    .type-badge-large { font-size: 38px; letter-spacing: 4px; }
+    .test-body { padding: 20px; }
+    .report-hero { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- ===== 欢迎页 ===== -->
+  <div class="welcome-screen" id="welcomeScreen">
+    <div class="welcome-logo">🧠</div>
+    <h1>MBTI 职场性格测评</h1>
+    <p class="subtitle">深入了解你的性格类型 · 发现职业优势 · 提升团队协作</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>93道专业题目</h3>
+        <p>涵盖四大维度，精准评估你的性格倾向</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>16种人格分析</h3>
+        <p>详细解读你的人格类型、优势与挑战</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💼</div>
+        <h3>个性化职业建议</h3>
+        <p>基于你的性格提供针对性的职业发展建议</p>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <p>📌 <strong>测评说明：</strong>本测评共 93 题，约需 15-20 分钟完成。请根据你的<strong>第一直觉</strong>作答，没有对错之分。结果仅供参考，用于帮助你更好地了解自己。</p>
+    </div>
+
+    <div style="max-width:460px;margin:0 auto 24px;">
+      <div class="form-row">
+        <div class="form-group">
+          <label>👤 您的姓名 *</label>
+          <input type="text" id="userName" placeholder="请输入您的真实姓名" required>
+        </div>
+        <div class="form-group">
+          <label>🏢 所在部门</label>
+          <input type="text" id="userDept" placeholder="如：市场部、技术部">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>💼 职位</label>
+          <input type="text" id="userRole" placeholder="如：产品经理、工程师">
+        </div>
+        <div class="form-group">
+          <label>🎂 年龄段</label>
+          <select id="userAge">
+            <option value="">请选择</option>
+            <option value="18-25">18-25岁</option>
+            <option value="26-30">26-30岁</option>
+            <option value="31-35">31-35岁</option>
+            <option value="36-40">36-40岁</option>
+            <option value="41+">41岁以上</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="startTest()" style="font-size:18px;padding:16px 48px;">
+      🚀 开始测评
+    </button>
+    <p style="margin-top:16px;font-size:13px;color:var(--text-light);">点击开始即表示您同意本测评结果用于团队性格分析</p>
+  </div>
+
+  <!-- ===== 测题页 ===== -->
+  <div class="test-screen" id="testScreen">
+    <div class="test-header">
+      <div class="test-header-top">
+        <div>
+          <div class="dimension-badge" id="dimensionBadge">⚡ 维度 1/4</div>
+          <h2 id="testTitle">E/I · 精力来源</h2>
+        </div>
+        <div class="progress-info" id="progressInfo">1 / 93</div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="test-body">
+      <div class="question-number" id="questionNum">第 1 题</div>
+      <div class="question-text" id="questionText">题目加载中...</div>
+      <div class="options-container" id="optionsContainer"></div>
+
+      <div class="test-nav">
+        <button class="btn btn-outline" id="prevBtn" onclick="prevQuestion()" disabled style="padding:10px 24px;font-size:14px;">
+          ← 上一题
+        </button>
+        <span id="navHint" style="font-size:13px;color:var(--text-light);">请选择一个选项</span>
+        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled style="padding:10px 24px;font-size:14px;">
+          下一题 →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 加载页 ===== -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-anim">
+      <div class="loading-ring"></div>
+      <div class="loading-ring"></div>
+    </div>
+    <h2>正在生成你的专属报告</h2>
+    <p>深度分析中，请稍候...</p>
+  </div>
+
+  <!-- ===== 报告页 ===== -->
+  <div class="report-screen" id="reportScreen"></div>
+
+</div>
+
+<!-- 浮动进度 -->
+<div class="float-progress" id="floatProgress">
+  <div class="float-dot"></div>
+  <span id="floatText">已完成 0%</span>
+</div>
+
+<script>
+// ============================================================
+//  MBTI 题库 (93 题)
+// ============================================================
+const questions = [
+  // E/I 维度 (1-23题)
+  { id:1,  dim:'EI', text:'在聚会上，你通常会',   a:'主动认识很多新朋友，享受与人交流的时光', b:'与少数几个熟人深入交谈，避免过多社交' },
+  { id:2,  dim:'EI', text:'一天工作结束后，你更倾向于',  a:'参加同事聚餐或社交活动来放松', b:'独自回家安静休息来恢复精力' },
+  { id:3,  dim:'EI', text:'你更擅长',  a:'快速思考，边说边想，表达流畅', b:'先思考好再表达，措辞更谨慎' },
+  { id:4,  dim:'EI', text:'遇到新项目，你通常',  a:'立即和团队讨论，头脑风暴', b:'独自先想清楚思路，再和他人讨论' },
+  { id:5,  dim:'EI', text:'你的朋友圈通常',  a:'广，认识很多人，但深交较少', b:'精，人数不多，但关系深厚' },
+  { id:6,  dim:'EI', text:'在小组讨论中，你',  a:'喜欢多发言，推动对话进行', b:'更多时候在倾听，等待合适时机再说' },
+  { id:7,  dim:'EI', text:'独处时，你会感到',  a:'有些无聊，想找人说说话', b:'舒适且享受，用来充电' },
+  { id:8,  dim:'EI', text:'你更喜欢的工作环境是',  a:'开放办公室，方便随时沟通', b:'独立隔间或居家，安静专注' },
+  { id:9,  dim:'EI', text:'接到陌生来电时，你会',  a:'毫不犹豫地直接接听', b:'感到有些不适，希望事先知道来意' },
+  { id:10, dim:'EI', text:'在会议中，你',  a:'经常主动发言，分享想法', b:'倾向于在会后以邮件方式表达看法' },
+  { id:11, dim:'EI', text:'初次见面时，别人觉得你',  a:'开朗健谈，容易相处', b:'安静低调，需要时间了解' },
+  { id:12, dim:'EI', text:'你更享受',  a:'开放式、互动性强的学习方式', b:'自学、独立钻研的学习方式' },
+  { id:13, dim:'EI', text:'长假期间，你更倾向于',  a:'和朋友一起出游，体验热闹', b:'一个人或和几个亲密朋友安静度假' },
+  { id:14, dim:'EI', text:'对于工作汇报，你',  a:'喜欢当面汇报，便于实时沟通', b:'更倾向书面报告，思路更完整' },
+  { id:15, dim:'EI', text:'进入新团队时，你',  a:'很快融入，主动打招呼', b:'需要一段时间观察，再逐渐融入' },
+  { id:16, dim:'EI', text:'你的能量来源于',  a:'与人互动、交流、讨论', b:'独处思考、内省、阅读' },
+  { id:17, dim:'EI', text:'对于社交媒体，你',  a:'频繁发布动态，积极互动', b:'较少主动发布，更多是浏览' },
+  { id:18, dim:'EI', text:'遇到问题，你首先会',  a:'与他人讨论，集思广益', b:'自己先思考、查资料' },
+  { id:19, dim:'EI', text:'你在噪音环境中',  a:'还好，甚至感到活跃', b:'很难集中注意力，需要安静' },
+  { id:20, dim:'EI', text:'你通常被描述为',  a:'外向、活泼、善于表达', b:'内敛、沉稳、善于思考' },
+  { id:21, dim:'EI', text:'在团队项目中，你',  a:'喜欢多人合作、共同推进', b:'更愿意明确分工、各司其职' },
+  { id:22, dim:'EI', text:'你更喜欢讨论',  a:'当下正在发生的事情和身边的人', b:'概念、想法和可能性' },
+  { id:23, dim:'EI', text:'别人向你寻求帮助时',  a:'你很乐意，且享受这种互动', b:'你会帮忙，但更喜欢以自己的方式' },
+
+  // S/N 维度 (24-46题)
+  { id:24, dim:'SN', text:'你更倾向于相信',  a:'经过验证的事实和具体数据', b:'直觉和对未来的预感' },
+  { id:25, dim:'SN', text:'在解决问题时，你偏好',  a:'按部就班，参考已有的成功经验', b:'探索新方法，哪怕风险更高' },
+  { id:26, dim:'SN', text:'你学习新知识时',  a:'喜欢具体、实际的例子和步骤', b:'更关注整体框架和背后原理' },
+  { id:27, dim:'SN', text:'你更享受工作中',  a:'执行落地、将计划付诸实践', b:'头脑风暴、构思新概念' },
+  { id:28, dim:'SN', text:'面对信息，你更关注',  a:'当前具体的细节和事实', b:'信息背后的模式和含义' },
+  { id:29, dim:'SN', text:'你的思维方式更像',  a:'一步一步、脚踏实地', b:'跳跃式，容易跨领域联想' },
+  { id:30, dim:'SN', text:'在做计划时',  a:'你制定详细步骤，喜欢有迹可循', b:'你只规划大方向，细节随机应变' },
+  { id:31, dim:'SN', text:'阅读文章时，你更喜欢',  a:'条理清晰、逻辑严谨的内容', b:'充满创意和想象力的内容' },
+  { id:32, dim:'SN', text:'你更容易注意到',  a:'事物的细节和变化', b:'整体的趋势和规律' },
+  { id:33, dim:'SN', text:'对你来说，更有吸引力的工作是',  a:'操作性强、成果可见的工作', b:'富有创造性、探索性的工作' },
+  { id:34, dim:'SN', text:'你在描述事物时',  a:'倾向于精确、具体，言之有据', b:'倾向于比喻、类比，描绘画面感' },
+  { id:35, dim:'SN', text:'休闲时间你更喜欢',  a:'做一件具体的事，如烹饪、运动', b:'读书、冥想、探索新思想' },
+  { id:36, dim:'SN', text:'面对一项新技术，你更关心',  a:'如何具体操作和实际应用', b:'这项技术对未来的影响和可能性' },
+  { id:37, dim:'SN', text:'你更信任',  a:'自己的五感和亲身经验', b:'自己的直觉和预判' },
+  { id:38, dim:'SN', text:'制作 PPT 时，你',  a:'注重数据准确、逻辑清晰', b:'更在意整体美感和故事性' },
+  { id:39, dim:'SN', text:'对于会议中的新想法，你',  a:'关注可行性和实施难度', b:'更感兴趣的是想法的创意本身' },
+  { id:40, dim:'SN', text:'你更欣赏',  a:'脚踏实地、注重结果的人', b:'富有想象力、充满创意的人' },
+  { id:41, dim:'SN', text:'在工作汇报中，你',  a:'用具体数据和案例支撑观点', b:'更多强调趋势、愿景和方向' },
+  { id:42, dim:'SN', text:'你的记忆方式更像',  a:'按照时间线记录具体事件', b:'记住整体印象和感受' },
+  { id:43, dim:'SN', text:'思考未来时，你更多',  a:'考虑近期、具体可实现的目标', b:'展望长远、大胆设想各种可能' },
+  { id:44, dim:'SN', text:'你更喜欢的文章类型',  a:'操作指南、案例分析', b:'思想性、哲学性、趋势洞察' },
+  { id:45, dim:'SN', text:'在团队中，你更倾向于',  a:'做执行者，把事情做好', b:'做创新者，提出新方向' },
+  { id:46, dim:'SN', text:'看到一幅抽象画，你',  a:'想知道作者想表达什么具体意思', b:'享受其中，自由联想' },
+
+  // T/F 维度 (47-69题)
+  { id:47, dim:'TF', text:'做决定时，你更依赖',  a:'逻辑分析和客观事实', b:'个人价值观和对他人感受的考量' },
+  { id:48, dim:'TF', text:'当朋友倾诉烦恼时，你',  a:'帮他分析问题，提供解决方案', b:'首先倾听，给予情感支持' },
+  { id:49, dim:'TF', text:'在评价他人时，你更看重',  a:'能力和成果', b:'人品和态度' },
+  { id:50, dim:'TF', text:'批评他人时，你',  a:'直接指出问题，认为这样更有效', b:'会先顾及对方感受，措辞较委婉' },
+  { id:51, dim:'TF', text:'遭受不公平对待时，你',  a:'据理力争，注重是非对错', b:'考虑大局，倾向于和平解决' },
+  { id:52, dim:'TF', text:'你认为好的领导者应该',  a:'有清晰的标准和高效的执行力', b:'善于关心员工，营造和谐氛围' },
+  { id:53, dim:'TF', text:'你更看重',  a:'公平、一致的规则', b:'特殊情况的灵活变通' },
+  { id:54, dim:'TF', text:'在争论中，你',  a:'注重逻辑和证据，不轻易妥协', b:'会考虑情感因素，有时会让步' },
+  { id:55, dim:'TF', text:'你在做选择时',  a:'进行利弊分析，择优而选', b:'跟随内心，选择感觉对的那个' },
+  { id:56, dim:'TF', text:'别人认为你',  a:'冷静理性，有时显得太直接', b:'热情体贴，有时优柔寡断' },
+  { id:57, dim:'TF', text:'在工作反馈中，你',  a:'希望得到直接、明确的评价', b:'更在意反馈是否尊重自己' },
+  { id:58, dim:'TF', text:'当团队出现矛盾时，你',  a:'寻找客观解决方案，排除情绪干扰', b:'先关注每个人的感受再解决问题' },
+  { id:59, dim:'TF', text:'你认为更有价值的是',  a:'有逻辑、有深度的分析', b:'有温度、有共鸣的交流' },
+  { id:60, dim:'TF', text:'面对批评，你',  a:'从问题出发，分析是否有理', b:'先感受到情绪，再理性思考' },
+  { id:61, dim:'TF', text:'给建议时，你倾向于',  a:'提供最优方案，即使对方不愿听', b:'提供对方愿意接受的方案，哪怕不是最优' },
+  { id:62, dim:'TF', text:'你更欣赏的特质是',  a:'聪明、果断、有逻辑', b:'善良、真诚、有同理心' },
+  { id:63, dim:'TF', text:'在职场中，你认为更重要的是',  a:'完成目标、达成绩效', b:'团队关系和谐、氛围良好' },
+  { id:64, dim:'TF', text:'遇到不合理的规定，你',  a:'会直接提出质疑或申诉', b:'会想方设法顾全大局，减少冲突' },
+  { id:65, dim:'TF', text:'别人向你表达感谢时，你',  a:'有些不自在，不擅长接受情感表达', b:'感到开心，也乐于回应' },
+  { id:66, dim:'TF', text:'你更容易被哪类电影打动',  a:'烧脑悬疑、逻辑严密的剧情片', b:'情感丰富、人物深刻的剧情片' },
+  { id:67, dim:'TF', text:'谈判中，你更注重',  a:'实现最优结果，即使关系紧张', b:'维持关系，在合理范围内让步' },
+  { id:68, dim:'TF', text:'你认为感情和理智哪个更重要',  a:'理智更可靠，感情容易误导人', b:'感情很重要，人不是机器' },
+  { id:69, dim:'TF', text:'工作中你更希望',  a:'有清晰的考核标准和奖惩机制', b:'有温暖的团队文化和相互支持' },
+
+  // J/P 维度 (70-93题)
+  { id:70, dim:'JP', text:'你对日程计划的态度',  a:'喜欢提前做好计划，有条不紊', b:'更倾向随机应变，保持灵活' },
+  { id:71, dim:'JP', text:'你的工位或桌面通常',  a:'整洁有序，物品归位', b:'看起来比较乱，但自己能找到东西' },
+  { id:72, dim:'JP', text:'面对截止日期',  a:'你会提前完成，避免最后时刻赶工', b:'你通常在临近截止日前密集发力完成' },
+  { id:73, dim:'JP', text:'当计划改变时，你',  a:'会感到不安，需要时间重新调整', b:'能快速接受，甚至觉得挺刺激' },
+  { id:74, dim:'JP', text:'旅行时，你',  a:'会提前规划路线、酒店和行程', b:'倾向随兴出发，边走边决定' },
+  { id:75, dim:'JP', text:'你更喜欢的工作方式是',  a:'有清晰的目标和步骤，按流程推进', b:'有较大自由度，可以随时调整方向' },
+  { id:76, dim:'JP', text:'对于未完成的事情',  a:'你会惦记，直到做完才舒服', b:'你可以先放着，不会特别焦虑' },
+  { id:77, dim:'JP', text:'你更倾向于',  a:'尽快做决定，减少不确定性', b:'保持开放，等更多信息再决策' },
+  { id:78, dim:'JP', text:'你的任务管理方式是',  a:'详细的待办列表，逐一完成', b:'记在脑子里，凭感觉推进' },
+  { id:79, dim:'JP', text:'做决定后，你',  a:'很少反悔，执行果断', b:'会回想是否有更好的选择' },
+  { id:80, dim:'JP', text:'你更享受',  a:'一件事从头做到尾，完整落地', b:'同时推进多件事，在切换中保持热情' },
+  { id:81, dim:'JP', text:'你认为好的工作状态是',  a:'高效完成任务，一切在掌控中', b:'充满变化和新鲜感，不断探索' },
+  { id:82, dim:'JP', text:'准备重要演讲时，你',  a:'充分准备讲稿和PPT，反复演练', b:'了解主题，临场发挥为主' },
+  { id:83, dim:'JP', text:'对规则和流程，你',  a:'认为必要，有助于维护秩序', b:'认为有时过于僵化，需要灵活处理' },
+  { id:84, dim:'JP', text:'你的购物方式',  a:'列好清单，按需购买', b:'随性浏览，有时被感觉冲动消费' },
+  { id:85, dim:'JP', text:'遇到意外情况，你',  a:'感到压力，需要立刻处理和安排', b:'能较快冷静，看情况再说' },
+  { id:86, dim:'JP', text:'你更欣赏的工作风格是',  a:'严谨认真、计划周全', b:'灵活高效、能够随机应变' },
+  { id:87, dim:'JP', text:'做项目收尾时，你',  a:'会检查所有细节，确保完整', b:'觉得差不多就可以，不必完美' },
+  { id:88, dim:'JP', text:'你对"计划赶不上变化"这句话',  a:'认同，但更倾向把计划做周全以减少变化', b:'接受，甚至觉得变化才是机会' },
+  { id:89, dim:'JP', text:'你的年度目标',  a:'会明确写下来，并定期检查进度', b:'有大概方向，细节不必太明确' },
+  { id:90, dim:'JP', text:'你偏好的沟通频率',  a:'按约定时间汇报，确保节奏可控', b:'随时有进展就沟通，不固定频率' },
+  { id:91, dim:'JP', text:'你更倾向于',  a:'先完成任务，再娱乐放松', b:'娱乐和工作穿插，不必非此即彼' },
+  { id:92, dim:'JP', text:'你如何看待"截止日期"',  a:'是必须遵守的承诺', b:'是参考目标，可以灵活调整' },
+  { id:93, dim:'JP', text:'评价你的工作，你更在乎',  a:'是否完全按计划落实', b:'是否解决了问题，过程如何不太重要' },
+];
+
+// ============================================================
+//  MBTI 16型报告数据
+// ============================================================
+const mbtiData = {
+  INTJ: {
+    name: '建筑师',
+    nickname: '战略思考者 · 独立且自驱',
+    emoji: '♟️',
+    color: '#4F46E5',
+    description: 'INTJ 型人是天生的战略家，以其无与伦比的逻辑思维和远见卓识著称。你善于独立思考，对知识和效率有着近乎偏执的追求。你不满足于表面，总是深入挖掘事物的本质规律，并制定精密的长远计划。',
+    strengths: ['战略思维极强，善于规划长远', '高度自律，自我驱动力强', '逻辑严密，分析问题深刻', '学习能力强，追求知识深度', '创新思维，敢于挑战传统', '目标专注，执行力强'],
+    weaknesses: [
+      { icon:'🚧', title:'社交疏离', desc:'不擅长表达情感，有时显得冷漠或傲慢' },
+      { icon:'🔒', title:'完美主义', desc:'对自己和他人要求极高，容易产生压力' },
+      { icon:'🗣️', title:'沟通强势', desc:'直接批评他人，容易无意中伤害感情' },
+      { icon:'🔄', title:'适应性差', desc:'对低效和无序高度敏感，难以接受偏差' },
+    ],
+    careers: ['战略顾问', '软件架构师', '研究员', '科学家', '首席技术官', '数据分析师', '金融分析师', '外科医生'],
+    careerAdvice: '你最适合需要深度思考和独立决策的职位。高度自主的研究型、技术型或领导型岗位最能发挥你的才能。建议有意识地培养情商，改善跨部门协作关系，这将大大加速你的职业上升。',
+    best: ['ENFP', 'ENTP', 'INFJ'],
+    worst: ['ESFP', 'ESTP'],
+    growth: ['主动练习倾听，不要急于给出解决方案', '每周至少一次表达对团队成员的认可和感谢', '接受"足够好"而非追求完美，提升整体效率', '培养耐心，理解他人的工作节奏可能与你不同'],
+  },
+  INTP: {
+    name: '逻辑学家',
+    nickname: '创新思想家 · 追求真理',
+    emoji: '🔭',
+    color: '#7C3AED',
+    description: 'INTP 型人是理论与逻辑的爱好者，你拥有广阔的内心世界，享受深入探讨复杂的思想和系统。你总是在脑海中构建精密的理论框架，对不一致之处异常敏感，追求智识上的纯粹与精确。',
+    strengths: ['抽象思维能力极强', '善于发现规律和矛盾', '高度好奇，持续自我学习', '思想开放，不受传统束缚', '在解决复杂问题时独具慧眼', '客观中立，不易受情绪左右'],
+    weaknesses: [
+      { icon:'😶', title:'情感表达困难', desc:'难以理解和处理情绪，人际关系较薄弱' },
+      { icon:'⏰', title:'拖延倾向', desc:'热衷分析构思，但在执行层面容易拖延' },
+      { icon:'🎭', title:'忽视社交规范', desc:'直接说出想法，有时显得不够圆滑' },
+      { icon:'🌪️', title:'思维跳跃', desc:'想法太多，难以聚焦，容易半途而废' },
+    ],
+    careers: ['哲学家', '软件工程师', '系统分析师', '大学教授', '研究科学家', '数学家', '网络安全专家'],
+    careerAdvice: '你在需要创新思维和深度分析的领域如鱼得水。建议选择弹性工作环境，减少繁琐行政事务。刻意练习执行力和时间管理，并找一个执行型搭档配合，可以极大提升你的产出。',
+    best: ['ENTJ', 'ESTJ', 'INTJ'],
+    worst: ['ESFJ', 'ISFJ'],
+    growth: ['为每个大目标设定具体的里程碑和截止日期', '刻意减少在完美方案上的过度思考', '积极参与团队活动，建立信任关系', '练习将复杂想法简化，以更易懂的方式表达'],
+  },
+  ENTJ: {
+    name: '指挥官',
+    nickname: '天生领袖 · 果断高效',
+    emoji: '👑',
+    color: '#DC2626',
+    description: 'ENTJ 是天生的领袖人才。你充满自信，目光长远，具备卓越的组织和执行能力。你善于发现机遇，快速做出决策，并将他人团结在共同目标之下。挑战对你来说是兴奋剂而非障碍。',
+    strengths: ['领导力强，善于激励他人', '战略思维与执行力兼备', '高效果断，目标导向', '自信有魄力，敢于承担责任', '善于组织资源和协调团队', '持续追求进步和卓越'],
+    weaknesses: [
+      { icon:'🔨', title:'过于强势', desc:'有时过于主导，不易倾听他人意见' },
+      { icon:'❄️', title:'缺乏耐心', desc:'对低效和能力不足者容易失去耐心' },
+      { icon:'💔', title:'忽视情感需求', desc:'过于注重目标，可能忽视团队成员情感' },
+      { icon:'🎯', title:'工作狂倾向', desc:'过度投入工作，影响生活平衡' },
+    ],
+    careers: ['CEO/总裁', '企业战略顾问', '投资银行家', '律师', '项目总监', '创业者', '政策制定者'],
+    careerAdvice: '你天生适合领导职位。建议有意识地培养同理心，学会放权和授权，构建高效团队而不是独自承担所有。在展现魄力的同时，关注团队心理安全，这将帮助你建立真正忠诚的团队。',
+    best: ['INTP', 'INFP', 'INTJ'],
+    worst: ['ISFP', 'INFP'],
+    growth: ['每次会议后，主动询问团队成员的顾虑', '练习放慢节奏，给他人充分的思考时间', '有意识地表达肯定和鼓励，不仅关注结果', '定期为自己安排休息和恢复时间'],
+  },
+  ENTP: {
+    name: '辩论家',
+    nickname: '思想先锋 · 充满创意',
+    emoji: '⚡',
+    color: '#D97706',
+    description: 'ENTP 是极具创造力的思想家。你思维敏捷，善于辩论，热爱智识挑战。你乐于挑战现状，质疑权威，总能用不同寻常的视角看待问题。你在充满活力、不断变化的环境中最为出色。',
+    strengths: ['创意无限，善于创新', '思维敏捷，反应迅速', '善于辩论，逻辑清晰', '充满活力，感染力强', '适应性强，迎接挑战', '视野开阔，联想能力强'],
+    weaknesses: [
+      { icon:'💨', title:'缺乏持续力', desc:'对起步兴奋，但难以持续投入到收尾阶段' },
+      { icon:'🌊', title:'争论好胜', desc:'享受辩论过程，有时为反对而反对' },
+      { icon:'📋', title:'不耐繁琐', desc:'不喜欢常规和细节性工作，容易走神' },
+      { icon:'🤯', title:'跳跃无序', desc:'同时关注太多事情，难以系统推进' },
+    ],
+    careers: ['创业者', '战略顾问', '市场营销总监', '产品经理', '编剧/创意总监', '律师', '风险投资人'],
+    careerAdvice: '你最擅长在充满创意和变化的环境中工作。建议找到一个细节导向的搭档来弥补你的弱项。主动练习将想法从概念推进到执行，而不只是停留在头脑风暴阶段。避免团队中"坏主意的破坏者"形象。',
+    best: ['INTJ', 'INFJ', 'ENFJ'],
+    worst: ['ISFJ', 'ESFJ'],
+    growth: ['为每个新项目设定"完成"的清晰标准', '减少不必要的辩论，练习接受他人意见', '将大目标拆分成小任务，逐步推进', '有意识地关注和感谢团队中的细节执行者'],
+  },
+  INFJ: {
+    name: '提倡者',
+    nickname: '理想主义者 · 有使命感',
+    emoji: '🌟',
+    color: '#059669',
+    description: 'INFJ 是最稀有的性格类型，约占人口的1-2%。你兼具理想主义与实践精神，对世界有着深刻的洞察力和强烈的使命感。你善于理解他人内心，能够在混乱中看到模式，并致力于推动有意义的改变。',
+    strengths: ['深刻的洞察力和同理心', '理想与行动力兼备', '坚定的价值观和道德感', '善于激励和影响他人', '创造力与远见结合', '谨慎而深思熟虑'],
+    weaknesses: [
+      { icon:'🛡️', title:'过度敏感', desc:'对批评和冲突极为敏感，情感容易受伤' },
+      { icon:'🔐', title:'完美主义', desc:'对自己要求极高，容易精疲力竭' },
+      { icon:'🙅', title:'不擅拒绝', desc:'不善于设立边界，常感到被他人需求淹没' },
+      { icon:'🏝️', title:'需要独处', desc:'社交后需要大量时间独处恢复，可能被误解' },
+    ],
+    careers: ['心理咨询师', '社工/NGO负责人', '作家', '医生', '教师/教育工作者', '人力资源总监', '艺术家'],
+    careerAdvice: '你最适合有意义感、能帮助他人成长的工作。选择与你价值观一致的组织非常重要。注意设立清晰的工作边界，避免情感透支。在帮助他人的同时，记得照顾好自己。',
+    best: ['ENTP', 'ENFP', 'INTJ'],
+    worst: ['ESTP', 'ISTP'],
+    growth: ['学习清晰表达自己的需求，而不只是顾及他人', '定期为自己安排独处和恢复时间', '接受"足够好"，减少完美主义带来的压力', '建立清晰的工作和生活边界，学会说"不"'],
+  },
+  INFP: {
+    name: '调停者',
+    nickname: '理想主义的梦想家',
+    emoji: '🌈',
+    color: '#7C3AED',
+    description: 'INFP 是内心世界极为丰富的理想主义者。你有着强烈的个人价值观，渴望为世界做出有意义的贡献。你善于理解他人，充满同理心，同时又有着独特的创造力。你相信每个人都有其价值和潜力。',
+    strengths: ['深厚的同理心和理解力', '强烈的价值观和道德感', '高度创造力和想象力', '真诚热情，忠于友情', '适应性强，思想开放', '善于从不同角度思考'],
+    weaknesses: [
+      { icon:'🌙', title:'理想主义过强', desc:'有时与现实脱节，难以接受不完美的妥协' },
+      { icon:'⏳', title:'行动力不足', desc:'喜欢思考和感受，但将想法付诸实践较难' },
+      { icon:'🎭', title:'过于敏感', desc:'情绪起伏较大，批评会造成较大的内心冲突' },
+      { icon:'🔀', title:'决策困难', desc:'考虑太多可能性，做决定时常犹豫不决' },
+    ],
+    careers: ['作家/编辑', '心理咨询师', '艺术家/设计师', '社会工作者', '音乐家', '教育工作者', '公益机构'],
+    careerAdvice: '你在创意和助人型行业最能发光。寻找允许你表达个人价值观的工作，并与愿意支持你的领导和同事共事。培养时间管理和项目执行技能，将你的理想变为现实。',
+    best: ['ENFJ', 'ENTJ', 'INFJ'],
+    worst: ['ESTJ', 'ENTJ'],
+    growth: ['制定具体的执行计划，从小目标开始积累成就感', '练习接受建设性批评，不过度个人化', '定期检视目标，确保理想与行动保持同步', '学会在适当时候寻求外部支持'],
+  },
+  ENFJ: {
+    name: '主人公',
+    nickname: '天生教练 · 感染力强',
+    emoji: '🌟',
+    color: '#DC2626',
+    description: 'ENFJ 是天生的领袖，不过是那种以魅力和同理心领导的类型。你对他人的感受高度敏感，善于发现每个人的潜能。你有着强大的感召力，能够将不同的人凝聚在共同愿景之下，并推动积极改变。',
+    strengths: ['强大的感召力和影响力', '高情商，善于理解他人', '出色的沟通和协调能力', '有担当，勇于负责', '积极乐观，激励团队', '善于培养他人潜能'],
+    weaknesses: [
+      { icon:'🎭', title:'过度在意他人看法', desc:'太在乎别人感受，可能忽视自己的需要' },
+      { icon:'🔮', title:'理想主义', desc:'对他人期望过高，失望时反应较大' },
+      { icon:'🛑', title:'难以冲突', desc:'为维护和谐而回避必要的直接对话' },
+      { icon:'🏋️', title:'精力透支', desc:'给予太多，忘记为自己充电' },
+    ],
+    careers: ['教师/培训师', '企业教练', 'HR负责人', '心理咨询师', '公关总监', '销售总监', '社区领袖'],
+    careerAdvice: '你在管理人和培育人才的岗位上极有价值。选择能发挥沟通和领导优势的职业方向。注意在关心他人的同时保护自己的情感资源，设立健康的边界。',
+    best: ['INFP', 'ISFP', 'INFJ'],
+    worst: ['ISTP', 'ESTP'],
+    growth: ['学会接受他人的不认可，而不过度内耗', '定期为自己安排休息，而非不断给予', '在必要时直接表达不满，避免积压情绪', '接受自己的不完美，减少过度自我批评'],
+  },
+  ENFP: {
+    name: '竞选者',
+    nickname: '热情创意人 · 感染力强',
+    emoji: '🎨',
+    color: '#F59E0B',
+    description: 'ENFP 充满活力和热情，是真正的自由灵魂。你对世界充满好奇，善于与各种人建立深刻的联系，总能看到每个人和每件事的潜力。你的创造力和感染力让你在任何地方都能成为亮点。',
+    strengths: ['热情感染力强，激励他人', '创造力丰富，想法新颖', '善于建立真诚深厚的人际关系', '适应力强，在变化中成长', '直觉敏锐，善于洞察机会', '充满能量，积极乐观'],
+    weaknesses: [
+      { icon:'🌊', title:'专注力分散', desc:'容易被新鲜事物吸引，难以持续专注' },
+      { icon:'📝', title:'不善细节', desc:'关注大图景，常忽略重要的执行细节' },
+      { icon:'🎢', title:'情绪波动', desc:'情绪受外部影响较大，高低起伏明显' },
+      { icon:'⌚', title:'时间管理弱', desc:'低估任务时间，常因分心而拖延' },
+    ],
+    careers: ['品牌经理', '公关总监', '创业者', '演员/主持人', '心理咨询师', '教师', '广告创意总监'],
+    careerAdvice: '你在需要创意、沟通和人际互动的岗位上最为出色。建议主动培养时间管理和项目执行技能，找到能让你的热情持续燃烧的长期使命感，而不只是短期兴奋。',
+    best: ['INTJ', 'INFJ', 'ENTJ'],
+    worst: ['ISTJ', 'ESTJ'],
+    growth: ['每天设定三个最重要的任务，先完成再切换', '使用时间块工作法，减少多任务干扰', '培养习惯性复盘，检视项目进度', '在重要事项上与他人建立承诺机制'],
+  },
+  ISTJ: {
+    name: '物流师',
+    nickname: '可靠的守护者 · 务实稳重',
+    emoji: '🏛️',
+    color: '#1D4ED8',
+    description: 'ISTJ 是高度可靠和务实的人格类型。你诚实守信，一丝不苟，对责任有着强烈的认同感。你尊重传统和已建立的方法，通过耐心细致的工作来保证高质量的成果。团队和家庭都能依赖你。',
+    strengths: ['高度可靠，言出必行', '细致认真，注重质量', '强烈的责任感和职业道德', '逻辑清晰，条理分明', '稳定踏实，不轻易动摇', '尊重规则，维护秩序'],
+    weaknesses: [
+      { icon:'🔒', title:'抗拒变化', desc:'对新事物和新方法持保守态度，适应慢' },
+      { icon:'📏', title:'过于刻板', desc:'过于强调规则，有时缺乏灵活性' },
+      { icon:'❤️', title:'情感不善表达', desc:'内心有感情但不擅长对外表达' },
+      { icon:'💭', title:'过于保守', desc:'倾向于按老方法做事，可能错失创新机会' },
+    ],
+    careers: ['会计师', '审计师', '法务人员', '项目经理', '行政主管', '数据库管理员', '军警人员'],
+    careerAdvice: '你在结构化、规范化的环境中工作效率极高。追求稳定且责任清晰的职位，同时有意识地培养对变化的接受度，并练习在团队中主动分享你的内心想法，增强人际温度。',
+    best: ['ESTP', 'ESFP', 'ESTJ'],
+    worst: ['ENFP', 'ENTP'],
+    growth: ['每月尝试一种新的工作方式或工具', '有意识地主动分享自己的想法和情感', '练习说出肯定他人的话，而不只是关注问题', '为自己设定持续学习的目标，保持与时俱进'],
+  },
+  ISFJ: {
+    name: '守卫者',
+    nickname: '无私奉献的保护者',
+    emoji: '🛡️',
+    color: '#059669',
+    description: 'ISFJ 是最受欢迎的人格类型之一，温暖体贴，极为可靠。你天生善于观察他人需求，并在他们意识到之前就已经付出了关怀。你有着强烈的责任感和奉献精神，总是默默支撑身边的人。',
+    strengths: ['极度体贴，关注细节', '可靠稳定，说到做到', '耐心细心，善于倾听', '谦逊低调，不争功', '善于营造温馨氛围', '记忆力好，重视承诺'],
+    weaknesses: [
+      { icon:'🙈', title:'过度谦让', desc:'太在乎他人，忽视自己的需求和边界' },
+      { icon:'😟', title:'难以拒绝', desc:'害怕令人失望，难以说"不"' },
+      { icon:'🔄', title:'抗拒变化', desc:'偏爱熟悉的方式，对变革较为抗拒' },
+      { icon:'💬', title:'内心压抑', desc:'把感受憋在心里，不擅长直接表达不满' },
+    ],
+    careers: ['护士/医护', '社会工作者', '教师', '行政助理', '人力资源专员', '图书管理员', '客户服务主管'],
+    careerAdvice: '你在需要关爱、服务和支持他人的职位上表现突出。建议主动学习如何设立个人边界，并练习直接表达自己的需求。寻找欣赏你付出的领导，为你的默默奉献给予应有的认可。',
+    best: ['ESTP', 'ESFP', 'ISTJ'],
+    worst: ['ENTJ', 'ENTP'],
+    growth: ['每周至少一次主动表达自己的需求', '练习对不合理要求说"不"', '有意识地寻求他人的帮助，而不总是自己扛', '培养一项只为自己而做的爱好，纯粹享受'],
+  },
+  ESTJ: {
+    name: '总经理',
+    nickname: '务实管理者 · 高效执行',
+    emoji: '📊',
+    color: '#B45309',
+    description: 'ESTJ 是高效的组织者和管理者。你重视传统、规则和纪律，善于建立和维护清晰的结构。你有着强烈的是非观，能够果断决策并确保目标达成。你是让组织稳定运转的重要力量。',
+    strengths: ['组织管理能力强', '高度自律，执行力强', '目标明确，结果导向', '诚实可靠，重视承诺', '善于建立秩序和流程', '有担当，勇于承责'],
+    weaknesses: [
+      { icon:'🚀', title:'缺乏灵活性', desc:'过于强调规则，难以接受非常规方案' },
+      { icon:'💢', title:'情绪化批评', desc:'指出他人问题时可能措辞过于直接生硬' },
+      { icon:'🎭', title:'忽视情感', desc:'优先关注任务完成，对情感需求不够敏感' },
+      { icon:'🔮', title:'眼光短视', desc:'关注现实，有时忽略长远战略布局' },
+    ],
+    careers: ['运营总监', '财务总监', '法院法官', '工厂主管', '军官', '政府官员', '项目总监'],
+    careerAdvice: '你在需要结构化管理和执行的领导岗位上非常高效。有意识地培养创新思维和情绪管理，避免过于刻板。多倾听下属的想法，给予足够的自主空间，这将让你的团队发挥更大潜能。',
+    best: ['ISFP', 'ISTP', 'ISTJ'],
+    worst: ['INFP', 'ENFP'],
+    growth: ['每月挑战一次传统方法，尝试创新途径', '有意识地在纠错之前先表达肯定', '多问"为什么"，而不只是关注"怎么做"', '学习将决策权适度下放，培养下属独立性'],
+  },
+  ESFJ: {
+    name: '执政官',
+    nickname: '友善的团队凝聚者',
+    emoji: '🤝',
+    color: '#7C3AED',
+    description: 'ESFJ 是温暖体贴的社交家，你天生关注他人的需求，并竭尽全力满足它们。你重视和谐与合作，是团队中不可或缺的粘合剂。你对传统和秩序有着深刻的尊重，并以自己的方式守护这些价值。',
+    strengths: ['高度体贴，善于照顾他人', '强大的社交网络建立能力', '可靠稳定，重视承诺', '积极乐观，营造和谐氛围', '实际务实，善于处理日常事务', '忠诚热情，值得信赖'],
+    weaknesses: [
+      { icon:'🎭', title:'过度在意评价', desc:'极度在乎他人看法，批评令其深受打击' },
+      { icon:'🔄', title:'固守传统', desc:'过于看重习俗和权威，难以接受新观念' },
+      { icon:'😔', title:'内心脆弱', desc:'为维护和谐而压抑自己，长期积累压力' },
+      { icon:'🌊', title:'情绪化', desc:'情感比较丰富，在压力下容易情绪波动' },
+    ],
+    careers: ['销售代表', '护士', '教师', '活动策划师', '客户关系经理', '行政主管', '医疗护理'],
+    careerAdvice: '你在服务导向和人际互动频繁的岗位最能发挥所长。在关注他人的同时，学会表达自己的想法和不满，建立健康边界。不要让对他人认可的需求左右你的职业决策。',
+    best: ['ISFP', 'ISTP', 'ESFP'],
+    worst: ['INTP', 'ENTP'],
+    growth: ['练习在提供帮助前先问自己是否真的愿意', '接受批评并从中学习，不要过度防御', '有意识地分享自己的真实想法，即使可能有争议', '多关注个人成长，而非只关注他人的评价'],
+  },
+  ISTP: {
+    name: '鉴赏家',
+    nickname: '冷静的实用主义者',
+    emoji: '🔧',
+    color: '#374151',
+    description: 'ISTP 是冷静的观察者，通常在幕后保持安静，直到问题出现，才会身先士卒，以无与伦比的效率找到解决方案。你对机械原理和动手操作有着天然的亲近，在紧急情况下临危不乱。',
+    strengths: ['极强的动手和操作能力', '逻辑清晰，解决实际问题', '冷静，在危机中保持镇定', '高度自给自足，不依赖他人', '直接务实，不喜欢拖泥带水', '善于观察，对细节敏感'],
+    weaknesses: [
+      { icon:'❄️', title:'情感冷漠', desc:'不善于表达情感，被认为冷漠或难以接近' },
+      { icon:'🚀', title:'缺乏长期规划', desc:'专注当下，对长远目标缺乏规划和热情' },
+      { icon:'🎭', title:'规避承诺', desc:'重视自由，对长期承诺感到不适' },
+      { icon:'💬', title:'沟通简短', desc:'不擅长言语表达情感，交流常显生硬' },
+    ],
+    careers: ['工程师', '机械师', '软件开发者', '外科医生', '飞行员', '军警', '运动员', '犯罪分析师'],
+    careerAdvice: '你在需要解决实际问题和动手能力强的岗位如鱼得水。提升沟通和情感表达能力，有助于在职场中建立更强的人际网络，推动职业晋升。',
+    best: ['ESTJ', 'ESFJ', 'ESTP'],
+    worst: ['ENFJ', 'INFJ'],
+    growth: ['每天主动向队友问候或分享一件事', '制定半年和一年的职业发展计划', '参加需要团队合作的项目，练习协作', '学习情感表达，适时分享自己的感受'],
+  },
+  ISFP: {
+    name: '探险家',
+    nickname: '灵活的艺术家',
+    emoji: '🎭',
+    color: '#059669',
+    description: 'ISFP 是温和友善的探索者，你活在当下，充满好奇和创造力。你有着强烈的个人价值观，虽然不轻易表达，但行动上却十分坚定。你欣赏生活中的美，并以独特的方式表达自己。',
+    strengths: ['高度同理心，对他人敏感', '充满创造力和艺术感', '灵活适应，享受当下', '真诚热情，对朋友极为忠诚', '善于观察，注意细节', '强烈的个人价值观'],
+    weaknesses: [
+      { icon:'📢', title:'不善自我表达', desc:'难以主动分享想法，容易被忽视' },
+      { icon:'💭', title:'过于随性', desc:'缺乏长远规划，容易随波逐流' },
+      { icon:'🔒', title:'回避冲突', desc:'强烈回避对抗，即使在必要时也不愿冲突' },
+      { icon:'⏳', title:'压力下退缩', desc:'在高压环境下容易变得封闭或逃避' },
+    ],
+    careers: ['设计师', '艺术家', '摄影师', '理疗师', '兽医', '厨师', '时尚设计师', '博物学家'],
+    careerAdvice: '你在充满创意和美感的领域最能发光。建议找到能展示你独特才华的舞台，并培养适当表达自己的能力。学习在团队中主动发声，让别人看到你宝贵的见解。',
+    best: ['ESTJ', 'ESFJ', 'ENFJ'],
+    worst: ['INTJ', 'ENTJ'],
+    growth: ['每周主动分享一次自己的想法或创意', '制定三个月的短期目标，并定期回顾', '练习在冲突中直接表达自己的感受', '在团队会议中主动发言，分享独特视角'],
+  },
+  ESTP: {
+    name: '企业家',
+    nickname: '活力行动者 · 实用冒险家',
+    emoji: '🚀',
+    color: '#DC2626',
+    description: 'ESTP 是充满活力的实干家。你思维敏锐，行动力强，总是直接解决问题。你善于在混乱中找到机会，在压力下反应迅速。你的魅力和直接让你成为天然的社交中心，善于推动事情快速发展。',
+    strengths: ['行动力极强，雷厉风行', '善于危机处理和快速决策', '社交能力强，充满魅力', '观察力敏锐，实用主义', '适应性强，灵活应变', '精力充沛，带动氛围'],
+    weaknesses: [
+      { icon:'💨', title:'缺乏耐心', desc:'不擅长长期规划和需要耐心的工作' },
+      { icon:'🎯', title:'冒险冲动', desc:'行动前思考不足，可能冒不必要的风险' },
+      { icon:'💔', title:'情感忽视', desc:'专注行动和结果，对他人情感需求不敏感' },
+      { icon:'📚', title:'不重细节', desc:'更关注大局，容易忽视关键的执行细节' },
+    ],
+    careers: ['销售总监', '创业者', '急诊医生', '消防员', '股票交易员', '体育运动员', '活动策划师'],
+    careerAdvice: '你在需要快速反应和高度灵活的工作环境中最为出色。有意识地培养延迟满足感，在做重大决策前先停一停，充分考虑长远影响。找一个有战略眼光的导师或搭档来平衡你的冲劲。',
+    best: ['ISTJ', 'ISFJ', 'ISTP'],
+    worst: ['INFJ', 'INFP'],
+    growth: ['在做重大决定前，强迫自己等24小时', '定期花时间复盘和规划未来3-6个月', '有意识地询问队友的感受，而不只关注结果', '培养一项需要长期坚持的技能或爱好'],
+  },
+  ESFP: {
+    name: '表演者',
+    nickname: '热情的娱乐家',
+    emoji: '🎉',
+    color: '#F59E0B',
+    description: 'ESFP 是最热情、最活泼的人格类型。你爱人，也爱被爱，对生活充满激情。你活在当下，享受与人联结的每一刻，有着天然的表演才华和感染力。在你身边，生活总是充满欢笑和活力。',
+    strengths: ['极强的感染力和表达力', '乐观开朗，带动气氛', '对他人高度关注和敏感', '实践能力强，动手解决问题', '善于适应和应变', '真诚热情，感情深厚'],
+    weaknesses: [
+      { icon:'🎭', title:'厌倦常规', desc:'难以忍受枯燥重复的工作，容易失去兴趣' },
+      { icon:'🌈', title:'长远规划弱', desc:'活在当下，对未来规划关注不足' },
+      { icon:'💔', title:'过于敏感', desc:'批评和冲突会让你非常不适' },
+      { icon:'🔀', title:'注意力分散', desc:'容易被新鲜刺激吸引，难以专注一件事' },
+    ],
+    careers: ['演员/主持人', '活动策划师', '销售代表', '旅游领队', '幼儿园教师', '理发师/造型师', '厨师'],
+    careerAdvice: '你最适合充满人际互动和创意的工作环境。在享受当下的同时，有意识地为未来做规划，建立财务和职业的长远目标。利用你的人格魅力发展职业网络，这将是你最大的竞争优势。',
+    best: ['ISTJ', 'ISFJ', 'ESFJ'],
+    worst: ['INTJ', 'INTP'],
+    growth: ['制定简单的月度目标，追踪自己的进步', '练习在娱乐之前先完成最重要的任务', '有意识地减少冲动消费，积累财务储蓄', '寻找一位导师，帮助你规划职业发展路径'],
+  },
+};
+
+// ============================================================
+//  应用状态
+// ============================================================
+const state = {
+  currentQ: 0,
+  answers: {},
+  user: { name:'', dept:'', role:'', age:'' },
+  startTime: null,
+};
+
+const dimNames = {
+  EI: ['E · 外向', 'I · 内向'],
+  SN: ['S · 实感', 'N · 直觉'],
+  TF: ['T · 思考', 'F · 情感'],
+  JP: ['J · 判断', 'P · 知觉'],
+};
+
+const dimDesc = {
+  EI: '精力来源',
+  SN: '信息处理',
+  TF: '决策方式',
+  JP: '生活态度',
+};
+
+const dimEmoji = { EI:'⚡', SN:'🔍', TF:'⚖️', JP:'📅' };
+
+// 维度分组
+const dimGroups = ['EI','SN','TF','JP'];
+function getDim(idx) {
+  const q = questions[idx];
+  return q ? q.dim : null;
+}
+function getDimIndex(dim) { return dimGroups.indexOf(dim); }
+
+// ============================================================
+//  界面控制
+// ============================================================
+function showScreen(name) {
+  ['welcomeScreen','testScreen','loadingScreen','reportScreen'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const el = document.getElementById(name + 'Screen');
+  if (el) el.style.display = ['welcome','test'].includes(name) ? 'block' : (name === 'report' ? 'block' : 'flex');
+  if (name === 'report') el.style.display = 'block';
+  if (name === 'loading') el.style.display = 'flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+//  开始测试
+// ============================================================
+function startTest() {
+  const name = document.getElementById('userName').value.trim();
+  if (!name) {
+    document.getElementById('userName').focus();
+    document.getElementById('userName').style.borderColor = '#EF4444';
+    return;
+  }
+  state.user.name = name;
+  state.user.dept = document.getElementById('userDept').value.trim();
+  state.user.role = document.getElementById('userRole').value.trim();
+  state.user.age = document.getElementById('userAge').value;
+  state.startTime = new Date();
+
+  showScreen('test');
+  document.getElementById('floatProgress').classList.add('visible');
+  renderQuestion(0);
+}
+
+// ============================================================
+//  渲染题目
+// ============================================================
+function renderQuestion(idx) {
+  const q = questions[idx];
+  const total = questions.length;
+  const pct = Math.round((idx / total) * 100);
+  const dim = q.dim;
+  const dimIdx = getDimIndex(dim) + 1;
+
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressInfo').textContent = `${idx + 1} / ${total}`;
+  document.getElementById('questionNum').textContent = `第 ${idx + 1} 题`;
+  document.getElementById('questionText').textContent = q.text;
+  document.getElementById('dimensionBadge').textContent = `${dimEmoji[dim]} 维度 ${dimIdx}/4`;
+  document.getElementById('testTitle').textContent = `${dimNames[dim][0].split('·')[0].trim()}/${dimNames[dim][1].split('·')[0].trim()} · ${dimDesc[dim]}`;
+  document.getElementById('floatText').textContent = `已完成 ${pct}%`;
+
+  const selected = state.answers[q.id];
+
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = '';
+
+  ['A','B'].forEach((letter, i) => {
+    const text = i === 0 ? q.a : q.b;
+    const btn = document.createElement('div');
+    btn.className = 'option-btn' + (selected === letter ? ' selected' : '');
+    btn.innerHTML = `
+      <div class="option-letter">${letter}</div>
+      <div class="option-text">${text}</div>
+    `;
+    btn.onclick = () => selectOption(q.id, letter, idx);
+    container.appendChild(btn);
+  });
+
+  // 导航按钮
+  document.getElementById('prevBtn').disabled = idx === 0;
+  updateNextBtn(idx);
+  document.getElementById('navHint').textContent = selected ? '✅ 已选择，可继续' : '👆 请选择一个选项';
+}
+
+function selectOption(qId, letter, idx) {
+  state.answers[qId] = letter;
+
+  // 更新视觉
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', ['A','B'][i] === letter);
+  });
+  document.getElementById('navHint').textContent = '✅ 已选择，可继续';
+  updateNextBtn(idx);
+
+  // 自动前进（300ms后）
+  setTimeout(() => {
+    if (idx < questions.length - 1) {
+      state.currentQ++;
+      renderQuestion(state.currentQ);
+    }
+  }, 300);
+}
+
+function updateNextBtn(idx) {
+  const q = questions[idx];
+  const hasAnswer = !!state.answers[q.id];
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = !hasAnswer;
+
+  if (idx === questions.length - 1 && hasAnswer) {
+    nextBtn.textContent = '🎯 查看我的报告';
+    nextBtn.onclick = finishTest;
+  } else {
+    nextBtn.innerHTML = '下一题 →';
+    nextBtn.onclick = nextQuestion;
+  }
+}
+
+function prevQuestion() {
+  if (state.currentQ > 0) {
+    state.currentQ--;
+    renderQuestion(state.currentQ);
+  }
+}
+
+function nextQuestion() {
+  const q = questions[state.currentQ];
+  if (!state.answers[q.id]) return;
+
+  if (state.currentQ < questions.length - 1) {
+    state.currentQ++;
+    renderQuestion(state.currentQ);
+  } else {
+    finishTest();
+  }
+}
+
+// ============================================================
+//  计算 MBTI 类型
+// ============================================================
+function calcMBTI() {
+  const counts = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+
+  questions.forEach(q => {
+    const ans = state.answers[q.id];
+    if (!ans) return;
+    const map = {
+      EI: { A:'E', B:'I' },
+      SN: { A:'S', B:'N' },
+      TF: { A:'T', B:'F' },
+      JP: { A:'J', B:'P' },
+    };
+    counts[map[q.dim][ans]]++;
+  });
+
+  const type =
+    (counts.E >= counts.I ? 'E' : 'I') +
+    (counts.S >= counts.N ? 'S' : 'N') +
+    (counts.T >= counts.F ? 'T' : 'F') +
+    (counts.J >= counts.P ? 'J' : 'P');
+
+  const dimScores = {
+    EI: { dominant: counts.E >= counts.I ? 'E' : 'I', pct: Math.round((Math.max(counts.E, counts.I) / (counts.E + counts.I)) * 100), total: counts.E + counts.I, E: counts.E, I: counts.I },
+    SN: { dominant: counts.S >= counts.N ? 'S' : 'N', pct: Math.round((Math.max(counts.S, counts.N) / (counts.S + counts.N)) * 100), total: counts.S + counts.N, S: counts.S, N: counts.N },
+    TF: { dominant: counts.T >= counts.F ? 'T' : 'F', pct: Math.round((Math.max(counts.T, counts.F) / (counts.T + counts.F)) * 100), total: counts.T + counts.F, T: counts.T, F: counts.F },
+    JP: { dominant: counts.J >= counts.P ? 'J' : 'P', pct: Math.round((Math.max(counts.J, counts.P) / (counts.J + counts.P)) * 100), total: counts.J + counts.P, J: counts.J, P: counts.P },
+  };
+
+  return { type, dimScores, counts };
+}
+
+// ============================================================
+//  完成测试
+// ============================================================
+function finishTest() {
+  showScreen('loading');
+  document.getElementById('floatProgress').classList.remove('visible');
+
+  setTimeout(() => {
+    const result = calcMBTI();
+    generateReport(result);
+  }, 2200);
+}
+
+// ============================================================
+//  生成报告
+// ============================================================
+function generateReport({ type, dimScores, counts }) {
+  const data = mbtiData[type] || mbtiData['INTJ'];
+  const user = state.user;
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric' });
+  const timeStr = now.toLocaleTimeString('zh-CN', { hour:'2-digit', minute:'2-digit' });
+  const duration = Math.round((now - state.startTime) / 60000);
+
+  // 存储到 localStorage 供导出
+  const resultData = {
+    name: user.name,
+    dept: user.dept,
+    role: user.role,
+    age: user.age,
+    type,
+    typeName: data.name,
+    date: dateStr,
+    time: timeStr,
+    duration,
+    E: counts.E, I: counts.I, S: counts.S, N: counts.N,
+    T: counts.T, F: counts.F, J: counts.J, P: counts.P,
+    EIPct: dimScores.EI.pct,
+    SNPct: dimScores.SN.pct,
+    TFPct: dimScores.TF.pct,
+    JPPct: dimScores.JP.pct,
+    strengths: data.strengths.join('、'),
+    careers: data.careers.join('、'),
+  };
+
+  // 追加到全部结果列表
+  const allResults = JSON.parse(localStorage.getItem('mbtiResults') || '[]');
+  allResults.push(resultData);
+  localStorage.setItem('mbtiResults', JSON.stringify(allResults));
+  localStorage.setItem('mbtiLastResult', JSON.stringify(resultData));
+
+  // 构建报告 HTML
+  const dimLabels = [
+    { a:'E 外向', b:'I 内向', ka:'E', kb:'I', key:'EI' },
+    { a:'S 实感', b:'N 直觉', ka:'S', kb:'N', key:'SN' },
+    { a:'T 思考', b:'F 情感', ka:'T', kb:'F', key:'TF' },
+    { a:'J 判断', b:'P 知觉', ka:'J', kb:'P', key:'JP' },
+  ];
+
+  const dimScoreHTML = dimLabels.map(d => {
+    const sc = dimScores[d.key];
+    const fillPct = sc.dominant === d.ka ? sc.pct : (100 - sc.pct);
+    return `
+      <div class="dim-score-card">
+        <div class="dim-labels"><span>${d.a}</span><span>${d.b}</span></div>
+        <div class="dim-bar-wrap"><div class="dim-bar-fill" style="width:${fillPct}%"></div></div>
+        <div class="dim-selected">${sc.dominant} · ${sc.pct}%</div>
+      </div>`;
+  }).join('');
+
+  const strengthsHTML = data.strengths.map(s =>
+    `<div class="trait-item"><div class="trait-dot" style="background:#10B981"></div><p>${s}</p></div>`
+  ).join('');
+
+  const weaknessesHTML = data.weaknesses.map(w =>
+    `<div class="weakness-item"><div class="wi-icon">${w.icon}</div><div><div class="wi-title">${w.title}</div><div class="wi-desc">${w.desc}</div></div></div>`
+  ).join('');
+
+  const careersHTML = data.careers.map(c =>
+    `<div class="career-tag">💼 ${c}</div>`
+  ).join('');
+
+  const bestHTML = data.best.map(t => `<span class="compat-type-tag">${t}</span>`).join('');
+  const worstHTML = data.worst.map(t => `<span class="compat-type-tag">${t}</span>`).join('');
+
+  const growthHTML = data.growth.map((g, i) =>
+    `<div class="growth-item"><div class="growth-num">${i+1}</div><p>${g}</p></div>`
+  ).join('');
+
+  const reportHTML = `
+    <!-- Hero -->
+    <div class="report-hero">
+      <div class="report-hero-content">
+        <div class="user-greeting">🎉 ${user.name}，你的专属报告已生成</div>
+        <div class="type-badge-large">${type}</div>
+        <div class="type-name-large">${data.emoji} ${data.name}</div>
+        <div class="type-nickname">${data.nickname}</div>
+        <div class="dimension-scores">${dimScoreHTML}</div>
+        <div style="margin-top:16px;font-size:13px;opacity:0.7;">
+          ${dateStr} ${timeStr} · 用时约${duration}分钟
+          ${user.dept ? ' · ' + user.dept : ''}${user.role ? ' · ' + user.role : ''}
+        </div>
+      </div>
+    </div>
+
+    <!-- 人格描述 -->
+    <div class="report-card">
+      <div class="report-card-header">
+        <div class="card-icon" style="background:#EEF2FF">${data.emoji}</div>
+        <h3>你的人格描述</h3>
+      </div>
+      <div class="desc-text">${data.description}</div>
+    </div>
+
+    <!-- 优势 -->
+    <div class="report-card">
+      <div class="report-card-header">
+        <div class="card-icon" style="background:#F0FDF4">✨</div>
+        <h3>核心优势</h3>
+      </div>
+      <div class="trait-list">${strengthsHTML}</div>
+    </div>
+
+    <!-- 弱点 -->
+    <div class="report-card">
+      <div class="report-card-header">
+        <div class="card-icon" style="background:#FFFBEB">⚠️</div>
+        <h3>潜在挑战</h3>
+      </div>
+      <div class="weakness-list">${weaknessesHTML}</div>
+    </div>
+
+    <!-- 职业建议 -->
+    <div class="report-card">
+      <div class="report-card-header">
+        <div class="card-icon" style="background:#F0F9FF">💼</div>
+        <h3>职业发展建议</h3>
+      </div>
+      <p class="section-group-title" style="margin-bottom:14px;">适合的职业方向</p>
+      <div class="career-grid">${careersHTML}</div>
+      <div class="career-advice-box">
+        <h4>🌟 个性化职业建议</h4>
+        <p>${data.careerAdvice}</p>
+      </div>
+    </div>
+
+    <!-- 人际兼容 -->
+    <div class="report-card">
+      <div class="report-card-header">
+        <div class="card-icon" style="background:#FFF1F2">🤝</div>
+        <h3>职场人际匹配</h3>
+      </div>
+      <div class="compat-section">
+        <div class="compat-box best">
+          <h4>💚 最佳搭档</h4>
+          <div class="compat-types">${bestHTML}</div>
+        </div>
+        <div class="compat-box worst">
+          <h4>❤️ 需要努力磨合</h4>
+          <div class="compat-types">${worstHTML}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 成长建议 -->
+    <div class="report-card">
+      <div class="report-card-header">
+        <div class="card-icon" style="background:#F5F3FF">🌱</div>
+        <h3>个人成长建议</h3>
+      </div>
+      <div class="growth-list">${growthHTML}</div>
+    </div>
+
+    <!-- 导出区 -->
+    <div class="export-section" id="exportSection">
+      <h3>📥 导出你的报告</h3>
+      <p>将测评结果保存下来，或分享给你的 HR / 团队负责人</p>
+      <div class="export-buttons">
+        <button class="btn" style="background:linear-gradient(135deg,#00A870 0%,#00C48C 100%);color:white;box-shadow:0 4px 15px rgba(0,168,112,0.4);font-size:17px;padding:16px 36px;" onclick="submitToFeishu(this)" id="feishuBtn">
+          🚀 提交到飞书智能表格
+        </button>
+        <button class="btn btn-primary" onclick="exportCSV()">📊 下载 CSV</button>
+        <button class="btn btn-outline" onclick="copyResult()">📋 复制报告摘要</button>
+      </div>
+      <div id="feishuMsg" style="margin-top:14px;font-size:14px;font-weight:600;display:none;"></div>
+    </div>
+
+    <!-- 飞书使用指引 -->
+    <div class="feishu-guide">
+      <h3>📌 飞书智能表格已自动同步</h3>
+      <div class="step-list">
+        <div class="step-item"><div class="step-num">✅</div><p>点击上方 <strong>「提交到飞书智能表格」</strong> 按钮，结果将自动写入飞书多维表格</p></div>
+        <div class="step-item"><div class="step-num">📊</div><p>打开飞书，进入 <strong>多维表格</strong> 中的「MBTI员工性格测评结果」即可查看</p></div>
+        <div class="step-item"><div class="step-num">🔗</div><p>表格链接：<a href="https://icn7tuspm5us.feishu.cn/base/Ixv9bL4HkasDCcsYCfnc2MLwnnh" target="_blank">MBTI员工性格测评结果</a></p></div>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:20px 0 40px;">
+      <button class="btn btn-outline" onclick="restartTest()">🔄 重新测评</button>
+      &nbsp;&nbsp;
+      <button class="btn btn-primary" onclick="viewAllResults()">📊 查看所有测评记录</button>
+    </div>
+  `;
+
+  const reportScreen = document.getElementById('reportScreen');
+  reportScreen.innerHTML = reportHTML;
+  showScreen('report');
+
+  // 动画维度条
+  setTimeout(() => {
+    document.querySelectorAll('.dim-bar-fill').forEach(el => {
+      const w = el.style.width;
+      el.style.width = '0%';
+      setTimeout(() => { el.style.width = w; }, 100);
+    });
+  }, 300);
+}
+
+// ============================================================
+//  导出功能
+// ============================================================
+function exportCSV() {
+  const allResults = JSON.parse(localStorage.getItem('mbtiResults') || '[]');
+  if (allResults.length === 0) { alert('没有测评数据'); return; }
+
+  const headers = ['姓名','部门','职位','年龄段','MBTI类型','人格名称','测评日期','测评时间','用时(分钟)',
+    'E分','I分','S分','N分','T分','F分','J分','P分',
+    'EI倾向%','SN倾向%','TF倾向%','JP倾向%',
+    '核心优势','推荐职业'];
+
+  const rows = allResults.map(r => [
+    r.name, r.dept, r.role, r.age, r.type, r.typeName, r.date, r.time, r.duration,
+    r.E, r.I, r.S, r.N, r.T, r.F, r.J, r.P,
+    r.EIPct, r.SNPct, r.TFPct, r.JPPct,
+    r.strengths, r.careers
+  ]);
+
+  const csv = '\uFEFF' + [headers, ...rows].map(r => r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  downloadFile(csv, `MBTI测评结果_${new Date().toLocaleDateString('zh-CN').replace(/\//g,'-')}.csv`, 'text/csv;charset=utf-8');
+}
+
+function exportJSON() {
+  const last = JSON.parse(localStorage.getItem('mbtiLastResult') || '{}');
+  const type = last.type;
+  if (!type) return;
+  const data = mbtiData[type];
+  const fullReport = {
+    ...last,
+    personality: {
+      description: data.description,
+      strengths: data.strengths,
+      weaknesses: data.weaknesses.map(w => `${w.title}: ${w.desc}`),
+      careerAdvice: data.careerAdvice,
+      recommendedCareers: data.careers,
+      bestMatch: data.best,
+      needsWork: data.worst,
+      growthSuggestions: data.growth,
+    }
+  };
+  downloadFile(JSON.stringify(fullReport, null, 2), `MBTI报告_${last.name}_${type}.json`, 'application/json');
+}
+
+function copyResult() {
+  const last = JSON.parse(localStorage.getItem('mbtiLastResult') || '{}');
+  if (!last.type) return;
+  const data = mbtiData[last.type];
+  const text = `【MBTI 测评结果】
+姓名：${last.name}
+部门：${last.dept || '未填写'} | 职位：${last.role || '未填写'}
+类型：${last.type} - ${data.name}（${data.nickname}）
+测评时间：${last.date} ${last.time}
+
+📊 维度得分：
+· E/I：${last.type[0]} 倾向 ${last.EIPct}%
+· S/N：${last.type[1]} 倾向 ${last.SNPct}%
+· T/F：${last.type[2]} 倾向 ${last.TFPct}%
+· J/P：${last.type[3]} 倾向 ${last.JPPct}%
+
+✨ 核心优势：${data.strengths.slice(0,3).join('、')}
+💼 推荐职业：${data.careers.slice(0,4).join('、')}
+🌱 成长建议：${data.growth[0]}`;
+
+  navigator.clipboard.writeText(text).then(() => alert('已复制到剪贴板 ✅')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('已复制到剪贴板 ✅');
+  });
+}
+
+function downloadFile(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function restartTest() {
+  state.currentQ = 0;
+  state.answers = {};
+  state.startTime = null;
+  document.getElementById('userName').style.borderColor = '';
+  showScreen('welcome');
+}
+
+function viewAllResults() {
+  const allResults = JSON.parse(localStorage.getItem('mbtiResults') || '[]');
+  if (allResults.length === 0) { alert('暂无其他测评记录'); return; }
+
+  const stats = {};
+  allResults.forEach(r => { stats[r.type] = (stats[r.type] || 0) + 1; });
+  const sorted = Object.entries(stats).sort((a,b) => b[1]-a[1]);
+
+  let msg = `📊 本设备共收集 ${allResults.length} 条测评记录\n\n`;
+  msg += '人格类型分布：\n';
+  sorted.forEach(([t,n]) => {
+    const data = mbtiData[t];
+    msg += `${t} (${data?.name || '?'}): ${n} 人\n`;
+  });
+  msg += '\n💡 提示：请点击「下载CSV」导出所有记录到飞书';
+  alert(msg);
+}
+
+// ============================================================
+//  提交到飞书智能表格
+// ============================================================
+// Vercel 云端部署：使用同源地址，永久在线无需电脑开机
+const FEISHU_BACKEND = window.location.origin;
+
+function submitToFeishu(btn) {
+  const last = JSON.parse(localStorage.getItem('mbtiLastResult') || '{}');
+  if (!last.type) return;
+
+  const msgEl = document.getElementById('feishuMsg');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ 正在提交...';
+  msgEl.style.display = 'block';
+  msgEl.style.color = '#6B7280';
+  msgEl.textContent = '正在连接飞书智能表格...';
+
+  const now = new Date();
+  const dateStr = now.getFullYear() + '/' + 
+    String(now.getMonth() + 1).padStart(2, '0') + '/' + 
+    String(now.getDate()).padStart(2, '0') + ' ' +
+    String(now.getHours()).padStart(2, '0') + ':' + 
+    String(now.getMinutes()).padStart(2, '0');
+
+  const payload = {
+    "姓名": last.name,
+    "部门": last.dept || '',
+    "测试时间": dateStr,
+    "人格类型": last.type + ' - ' + (last.typeName || ''),
+    "E分值": last.E || 0,
+    "I分值": last.I || 0,
+    "S分值": last.S || 0,
+    "N分值": last.N || 0,
+    "T分值": last.T || 0,
+    "F分值": last.F || 0,
+    "J分值": last.J || 0,
+    "P分值": last.P || 0,
+  };
+
+  fetch(FEISHU_BACKEND + '/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  .then(res => res.json())
+  .then(data => {
+    btn.disabled = false;
+    btn.textContent = '🚀 提交到飞书智能表格';
+    if (data.success) {
+      msgEl.style.color = '#10B981';
+      msgEl.textContent = '✅ ' + data.msg;
+      // 标记已提交
+      const all = JSON.parse(localStorage.getItem('mbtiResults') || '[]');
+      const idx = all.length - 1;
+      if (idx >= 0) {
+        all[idx].feishuSubmitted = true;
+        localStorage.setItem('mbtiResults', JSON.stringify(all));
+      }
+    } else {
+      msgEl.style.color = '#EF4444';
+      msgEl.textContent = '❌ ' + (data.msg || '提交失败，请确保后端服务已启动');
+      msgEl.innerHTML += '<br><small style="font-weight:400;">💡 提示：请先运行 backend_server.py 启动后端服务</small>';
+    }
+  })
+  .catch(err => {
+    btn.disabled = false;
+    btn.textContent = '🚀 提交到飞书智能表格';
+    msgEl.style.color = '#EF4444';
+    msgEl.textContent = '❌ 无法连接到后端服务';
+    msgEl.innerHTML += '<br><small style="font-weight:400;">💡 请先运行 <code>backend_server.py</code> 启动服务后再提交</small>';
+  });
+}
+</script>
+</body>
+</html>
