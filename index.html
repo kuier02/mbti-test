@@ -1554,6 +1554,13 @@ function nextQuestion() {
   const q = questions[state.currentQ];
   if (!state.answers[q.id]) return;
 
+  // 如果所有题都已答完，直接出报告，不用一路点到最后一题
+  const allDone = questions.every(qq => state.answers[qq.id]);
+  if (allDone) {
+    finishTest();
+    return;
+  }
+
   if (state.currentQ < questions.length - 1) {
     state.currentQ++;
     renderQuestion(state.currentQ);
