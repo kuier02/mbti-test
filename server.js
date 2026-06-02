@@ -85,13 +85,10 @@ async function writeToFeishu(recordData) {
   const fields = {};
 
   const numFields = ['E分值', 'I分值', 'S分值', 'N分值', 'T分值', 'F分值', 'J分值', 'P分值',
-                     '用时_分钟', 'EI倾向', 'SN倾向', 'TF倾向', 'JP倾向'];
+                     'EI倾向', 'SN倾向', 'TF倾向', 'JP倾向'];
 
   for (const [key, value] of Object.entries(recordData)) {
-    if (key === '测试时间') {
-      // Feishu DateTime field requires millisecond timestamp
-      fields[key] = Date.now();
-    } else if (numFields.includes(key)) {
+    if (numFields.includes(key)) {
       fields[key] = parseInt(value) || 0;
     } else {
       fields[key] = String(value || '');
