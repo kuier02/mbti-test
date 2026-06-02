@@ -1597,6 +1597,20 @@ function calcMBTI() {
 //  完成测试
 // ============================================================
 function finishTest() {
+  const total = questions.length;
+  const answered = Object.keys(state.answers).length;
+  if (answered < total) {
+    const firstMissing = questions.find(q => !state.answers[q.id]);
+    if (firstMissing) {
+      state.currentQ = questions.indexOf(firstMissing);
+      renderQuestion(state.currentQ);
+      document.getElementById('floatProgress').classList.add('visible');
+      updateProgress(state.currentQ);
+    }
+    alert('你还有 ' + (total - answered) + ' 道题未答完，请完成所有题目后再查看报告。');
+    return;
+  }
+
   showScreen('loading');
   document.getElementById('floatProgress').classList.remove('visible');
 
@@ -1643,6 +1657,8 @@ function generateReport({ type, dimScores, counts }) {
     bestMatch: data.best.join('、'),
     worstMatch: data.worst.join('、'),
     growth: data.growth.join('\n'),
+    totalQuestions: questions.length,
+    answeredQuestions: Object.keys(state.answers).length,
   };
 
   // 追加到全部结果列表
@@ -1936,6 +1952,11 @@ const FEISHU_BACKEND = window.location.origin;
 function submitToFeishu(btn) {
   const last = JSON.parse(localStorage.getItem('mbtiLastResult') || '{}');
   if (!last.type) return;
+
+  if (last.totalQuestions && last.answeredQuestions < last.totalQuestions) {
+    alert('当前测试不完整（已答 ' + last.answeredQuestions + '/' + last.totalQuestions + ' 题），请返回完成所有题目后再提交。');
+    return;
+  }
 
   const msgEl = document.getElementById('feishuMsg');
 
