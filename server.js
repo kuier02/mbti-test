@@ -88,7 +88,10 @@ async function writeToFeishu(recordData) {
                      '用时_分钟', 'EI倾向', 'SN倾向', 'TF倾向', 'JP倾向'];
 
   for (const [key, value] of Object.entries(recordData)) {
-    if (numFields.includes(key)) {
+    if (key === '测试时间') {
+      // Feishu DateTime field requires millisecond timestamp
+      fields[key] = Date.now();
+    } else if (numFields.includes(key)) {
       fields[key] = parseInt(value) || 0;
     } else {
       fields[key] = String(value || '');
