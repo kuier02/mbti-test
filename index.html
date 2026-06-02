@@ -1976,6 +1976,18 @@ function submitToFeishu(btn) {
     String(now.getHours()).padStart(2, '0') + ':' + 
     String(now.getMinutes()).padStart(2, '0');
 
+  // 将原始答题计数转为百分比（每对相加=100），仅影响飞书表格，不影响问卷页面
+  const toPct = (a, b) => {
+    const total = (a || 0) + (b || 0);
+    if (total === 0) return [0, 0];
+    const pctA = Math.round((a || 0) / total * 100);
+    return [pctA, 100 - pctA];
+  };
+  const [E, I] = toPct(last.E, last.I);
+  const [S, N] = toPct(last.S, last.N);
+  const [T, F] = toPct(last.T, last.F);
+  const [J, P] = toPct(last.J, last.P);
+
   const payload = {
     "姓名": last.name,
     "部门": last.dept || '',
@@ -1985,18 +1997,18 @@ function submitToFeishu(btn) {
     "人格类型": last.type,
     "人格名称": (last.typeName || '') + (last.nickname ? ' - ' + last.nickname.replace(/ · /g, '，') : ''),
     "用时_分钟": last.duration || 0,
-    "E分值": last.E || 0,
-    "I分值": last.I || 0,
-    "S分值": last.S || 0,
-    "N分值": last.N || 0,
-    "T分值": last.T || 0,
-    "F分值": last.F || 0,
-    "J分值": last.J || 0,
-    "P分值": last.P || 0,
-    "EI倾向": last.EIPct || 0,
-    "SN倾向": last.SNPct || 0,
-    "TF倾向": last.TFPct || 0,
-    "JP倾向": last.JPPct || 0,
+    "E分值": E,
+    "I分值": I,
+    "S分值": S,
+    "N分值": N,
+    "T分值": T,
+    "F分值": F,
+    "J分值": J,
+    "P分值": P,
+    "EI倾向": Math.max(E, I),
+    "SN倾向": Math.max(S, N),
+    "TF倾向": Math.max(T, F),
+    "JP倾向": Math.max(J, P),
     "核心优势": last.strengths || '',
     "推荐职业": last.careers || '',
     "人格别称": last.nickname || '',
