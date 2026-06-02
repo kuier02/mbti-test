@@ -1554,17 +1554,20 @@ function nextQuestion() {
   const q = questions[state.currentQ];
   if (!state.answers[q.id]) return;
 
-  // 如果所有题都已答完，直接出报告，不用一路点到最后一题
-  const allDone = questions.every(qq => state.answers[qq.id]);
-  if (allDone) {
-    finishTest();
-    return;
+  // 找下一道未答的题，跳过所有已答的
+  let nextIdx = -1;
+  for (let i = state.currentQ + 1; i < questions.length; i++) {
+    if (!state.answers[questions[i].id]) {
+      nextIdx = i;
+      break;
+    }
   }
 
-  if (state.currentQ < questions.length - 1) {
-    state.currentQ++;
+  if (nextIdx !== -1) {
+    state.currentQ = nextIdx;
     renderQuestion(state.currentQ);
   } else {
+    // 后面没有未答题了，全部完成
     finishTest();
   }
 }
