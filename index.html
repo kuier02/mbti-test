@@ -1992,13 +1992,6 @@ function submitToFeishu(btn) {
   msgEl.style.color = '#6B7280';
   msgEl.textContent = '正在连接飞书智能表格...';
 
-  const now = new Date();
-  const dateStr = now.getFullYear() + '/' + 
-    String(now.getMonth() + 1).padStart(2, '0') + '/' + 
-    String(now.getDate()).padStart(2, '0') + ' ' +
-    String(now.getHours()).padStart(2, '0') + ':' + 
-    String(now.getMinutes()).padStart(2, '0');
-
   // 将原始答题计数转为百分比（每对相加=100），仅影响飞书表格，不影响问卷页面
   const toPct = (a, b) => {
     const total = (a || 0) + (b || 0);
@@ -2015,11 +2008,7 @@ function submitToFeishu(btn) {
     "姓名": last.name,
     "部门": last.dept || '',
     "职位": last.role || '',
-    "年龄段": last.age || '',
-    "测试时间": dateStr,
     "人格类型": last.type,
-    "人格名称": (last.typeName || '') + (last.nickname ? ' - ' + last.nickname.replace(/ · /g, '，') : ''),
-    "用时_分钟": last.duration || 0,
     "E分值": E,
     "I分值": I,
     "S分值": S,
