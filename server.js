@@ -14,7 +14,7 @@ const APP_SECRET = '93TOHe8RJcwCRMmYdP8InhsEsEXeqNV6';
 const APP_TOKEN = 'Ixv9bL4HkasDCcsYCfnc2MLwnnh';
 const TABLE_ID = 'tbl98yqaWVZeQXYT';
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // 缓存 token
 let cachedToken = null;
@@ -84,10 +84,11 @@ async function writeToFeishu(recordData) {
   const token = await getTenantToken();
   const fields = {};
 
+  const numFields = ['E分值', 'I分值', 'S分值', 'N分值', 'T分值', 'F分值', 'J分值', 'P分值',
+                     '用时_分钟', 'EI倾向', 'SN倾向', 'TF倾向', 'JP倾向'];
+
   for (const [key, value] of Object.entries(recordData)) {
-    if (key === '测试时间') {
-      fields[key] = Date.now();
-    } else if (['E分值', 'I分值', 'S分值', 'N分值', 'T分值', 'F分值', 'J分值', 'P分值'].includes(key)) {
+    if (numFields.includes(key)) {
       fields[key] = parseInt(value) || 0;
     } else {
       fields[key] = String(value || '');
