@@ -1634,8 +1634,15 @@ function generateReport({ type, dimScores, counts }) {
     SNPct: dimScores.SN.pct,
     TFPct: dimScores.TF.pct,
     JPPct: dimScores.JP.pct,
+    nickname: data.nickname,
+    description: data.description,
     strengths: data.strengths.join('、'),
+    weaknesses: data.weaknesses.map(w => `${w.icon} ${w.title}: ${w.desc}`).join('\n'),
     careers: data.careers.join('、'),
+    careerAdvice: data.careerAdvice,
+    bestMatch: data.best.join('、'),
+    worstMatch: data.worst.join('、'),
+    growth: data.growth.join('\n'),
   };
 
   // 追加到全部结果列表
@@ -1968,6 +1975,13 @@ function submitToFeishu(btn) {
     "JP倾向": last.JPPct || 0,
     "核心优势": last.strengths || '',
     "推荐职业": last.careers || '',
+    "人格别称": last.nickname || '',
+    "人格描述": last.description || '',
+    "潜在挑战": last.weaknesses || '',
+    "职业建议": last.careerAdvice || '',
+    "最佳搭档": last.bestMatch || '',
+    "需磨合类型": last.worstMatch || '',
+    "成长建议": last.growth || '',
   };
 
   fetch(FEISHU_BACKEND + '/submit', {
