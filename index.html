@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>MBTI 职场性格测评系统 v2.1</title>
+<title>MBTI 职场性格测评系统 v1.0</title>
 <style>
   :root {
     --primary: #4F46E5;
@@ -1519,11 +1519,24 @@ function selectOption(qId, letter, idx) {
   document.getElementById('navHint').textContent = '✅ 已选择，可继续';
   updateNextBtn(idx);
 
-  // 自动前进（300ms后）
+  // 自动前进到下一道未答的题（跳过已答的）
   setTimeout(() => {
-    if (idx < questions.length - 1) {
-      state.currentQ++;
+    let nextIdx = -1;
+    for (let i = idx + 1; i < questions.length; i++) {
+      if (!state.answers[questions[i].id]) {
+        nextIdx = i;
+        break;
+      }
+    }
+    if (nextIdx !== -1) {
+      state.currentQ = nextIdx;
       renderQuestion(state.currentQ);
+    } else {
+      // 后面没有未答题了，检查是否全部完成
+      const allDone = questions.every(qq => state.answers[qq.id]);
+      if (allDone) {
+        finishTest();
+      }
     }
   }, 300);
 }
