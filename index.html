@@ -2020,7 +2020,7 @@ function submitToFeishu(btn) {
     // 长文本字段添加换行，让飞书表格自动撑高行高
     "核心优势": (last.strengths || '').replace(/、/g, '\n'),
     "推荐职业": (last.careers || '').replace(/、/g, '\n'),
-    "人格别称": last.nickname || '',
+    "人格别称": (mbtiData[last.type].name + '-' + (last.nickname || '')).replace(/·/g, '，'),
     "人格描述": last.description || '',
     "潜在挑战": last.weaknesses || '',
     "职业建议": last.careerAdvice || '',
