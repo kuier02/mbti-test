@@ -2017,10 +2017,6 @@ function submitToFeishu(btn) {
     "F分值": F,
     "J分值": J,
     "P分值": P,
-    "EI倾向": Math.max(E, I),
-    "SN倾向": Math.max(S, N),
-    "TF倾向": Math.max(T, F),
-    "JP倾向": Math.max(J, P),
     // 长文本字段添加换行，让飞书表格自动撑高行高
     "核心优势": (last.strengths || '').replace(/、/g, '\n'),
     "推荐职业": (last.careers || '').replace(/、/g, '\n'),

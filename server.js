@@ -84,8 +84,7 @@ async function writeToFeishu(recordData) {
   const token = await getTenantToken();
   const fields = {};
 
-  const numFields = ['E分值', 'I分值', 'S分值', 'N分值', 'T分值', 'F分值', 'J分值', 'P分值',
-                     'EI倾向', 'SN倾向', 'TF倾向', 'JP倾向'];
+  const numFields = ['E分值', 'I分值', 'S分值', 'N分值', 'T分值', 'F分值', 'J分值', 'P分值'];
 
   for (const [key, value] of Object.entries(recordData)) {
     if (numFields.includes(key)) {
