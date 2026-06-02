@@ -1,0 +1,12 @@
+{
+  "name": "mbti-test",
+  "version": "1.0.0",
+  "description": "MBTI 职场性格测评系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
