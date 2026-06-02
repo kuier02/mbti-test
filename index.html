@@ -1948,8 +1948,12 @@ function submitToFeishu(btn) {
   const payload = {
     "姓名": last.name,
     "部门": last.dept || '',
+    "职位": last.role || '',
+    "年龄段": last.age || '',
     "测试时间": dateStr,
-    "人格类型": last.type + ' - ' + (last.typeName || ''),
+    "人格类型": last.type,
+    "人格名称": last.typeName || '',
+    "用时_分钟": last.duration || 0,
     "E分值": last.E || 0,
     "I分值": last.I || 0,
     "S分值": last.S || 0,
@@ -1958,6 +1962,12 @@ function submitToFeishu(btn) {
     "F分值": last.F || 0,
     "J分值": last.J || 0,
     "P分值": last.P || 0,
+    "EI倾向": last.EIPct || 0,
+    "SN倾向": last.SNPct || 0,
+    "TF倾向": last.TFPct || 0,
+    "JP倾向": last.JPPct || 0,
+    "核心优势": last.strengths || '',
+    "推荐职业": last.careers || '',
   };
 
   fetch(FEISHU_BACKEND + '/submit', {
