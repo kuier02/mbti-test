@@ -1,12 +1,9 @@
 {
-  "name": "mbti-test",
+  "name": "mbti-feishu",
   "version": "1.0.0",
-  "description": "MBTI 职场性格测评系统",
+  "description": "MBTI Employee Assessment - Feishu Integration",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
-  },
-  "engines": {
-    "node": ">=18"
   }
 }

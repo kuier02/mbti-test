@@ -3,10 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>MBTI 职场性格测评系统 v1.0</title>
+<title>MBTI 职场性格测评系统</title>
 <style>
   :root {
     --primary: #4F46E5;
@@ -983,6 +980,15 @@
 
 <script>
 // ============================================================
+//  协作者口令验证 - 带 ?token=xxx 才能看到飞书链接
+// ============================================================
+const ADMIN_TOKEN = 'mbti2025';
+function isAdmin() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('token') === ADMIN_TOKEN;
+}
+
+// ============================================================
 //  MBTI 题库 (93 题)
 // ============================================================
 const questions = [
@@ -1519,24 +1525,11 @@ function selectOption(qId, letter, idx) {
   document.getElementById('navHint').textContent = '✅ 已选择，可继续';
   updateNextBtn(idx);
 
-  // 自动前进到下一道未答的题（跳过已答的）
+  // 自动前进（300ms后）
   setTimeout(() => {
-    let nextIdx = -1;
-    for (let i = idx + 1; i < questions.length; i++) {
-      if (!state.answers[questions[i].id]) {
-        nextIdx = i;
-        break;
-      }
-    }
-    if (nextIdx !== -1) {
-      state.currentQ = nextIdx;
+    if (idx < questions.length - 1) {
+      state.currentQ++;
       renderQuestion(state.currentQ);
-    } else {
-      // 后面没有未答题了，检查是否全部完成
-      const allDone = questions.every(qq => state.answers[qq.id]);
-      if (allDone) {
-        finishTest();
-      }
     }
   }, 300);
 }
@@ -1567,20 +1560,10 @@ function nextQuestion() {
   const q = questions[state.currentQ];
   if (!state.answers[q.id]) return;
 
-  // 找下一道未答的题，跳过所有已答的
-  let nextIdx = -1;
-  for (let i = state.currentQ + 1; i < questions.length; i++) {
-    if (!state.answers[questions[i].id]) {
-      nextIdx = i;
-      break;
-    }
-  }
-
-  if (nextIdx !== -1) {
-    state.currentQ = nextIdx;
+  if (state.currentQ < questions.length - 1) {
+    state.currentQ++;
     renderQuestion(state.currentQ);
   } else {
-    // 后面没有未答题了，全部完成
     finishTest();
   }
 }
@@ -1623,20 +1606,6 @@ function calcMBTI() {
 //  完成测试
 // ============================================================
 function finishTest() {
-  const total = questions.length;
-  const answered = Object.keys(state.answers).length;
-  if (answered < total) {
-    const firstMissing = questions.find(q => !state.answers[q.id]);
-    if (firstMissing) {
-      state.currentQ = questions.indexOf(firstMissing);
-      renderQuestion(state.currentQ);
-      document.getElementById('floatProgress').classList.add('visible');
-      updateProgress(state.currentQ);
-    }
-    alert('你还有 ' + (total - answered) + ' 道题未答完，请完成所有题目后再查看报告。');
-    return;
-  }
-
   showScreen('loading');
   document.getElementById('floatProgress').classList.remove('visible');
 
@@ -1674,17 +1643,8 @@ function generateReport({ type, dimScores, counts }) {
     SNPct: dimScores.SN.pct,
     TFPct: dimScores.TF.pct,
     JPPct: dimScores.JP.pct,
-    nickname: data.nickname,
-    description: data.description,
     strengths: data.strengths.join('、'),
-    weaknesses: data.weaknesses.map(w => `${w.icon} ${w.title}: ${w.desc}`).join('\n'),
     careers: data.careers.join('、'),
-    careerAdvice: data.careerAdvice,
-    bestMatch: data.best.join('、'),
-    worstMatch: data.worst.join('、'),
-    growth: data.growth.join('\n'),
-    totalQuestions: questions.length,
-    answeredQuestions: Object.keys(state.answers).length,
   };
 
   // 追加到全部结果列表
@@ -1829,7 +1789,8 @@ function generateReport({ type, dimScores, counts }) {
       <div id="feishuMsg" style="margin-top:14px;font-size:14px;font-weight:600;display:none;"></div>
     </div>
 
-    <!-- 飞书使用指引 -->
+    ${isAdmin() ? `
+    <!-- 飞书使用指引（仅协作者可见） -->
     <div class="feishu-guide">
       <h3>📌 飞书智能表格已自动同步</h3>
       <div class="step-list">
@@ -1838,6 +1799,7 @@ function generateReport({ type, dimScores, counts }) {
         <div class="step-item"><div class="step-num">🔗</div><p>表格链接：<a href="https://icn7tuspm5us.feishu.cn/base/Ixv9bL4HkasDCcsYCfnc2MLwnnh" target="_blank">MBTI员工性格测评结果</a></p></div>
       </div>
     </div>
+    ` : ''}
 
     <div style="text-align:center;padding:20px 0 40px;">
       <button class="btn btn-outline" onclick="restartTest()">🔄 重新测评</button>
@@ -1979,11 +1941,6 @@ function submitToFeishu(btn) {
   const last = JSON.parse(localStorage.getItem('mbtiLastResult') || '{}');
   if (!last.type) return;
 
-  if (last.totalQuestions && last.answeredQuestions < last.totalQuestions) {
-    alert('当前测试不完整（已答 ' + last.answeredQuestions + '/' + last.totalQuestions + ' 题），请返回完成所有题目后再提交。');
-    return;
-  }
-
   const msgEl = document.getElementById('feishuMsg');
 
   btn.disabled = true;
@@ -1992,44 +1949,29 @@ function submitToFeishu(btn) {
   msgEl.style.color = '#6B7280';
   msgEl.textContent = '正在连接飞书智能表格...';
 
-  // 将原始答题计数转为百分比（每对相加=100），仅影响飞书表格，不影响问卷页面
-  const toPct = (a, b) => {
-    const total = (a || 0) + (b || 0);
-    if (total === 0) return [0, 0];
-    const pctA = Math.round((a || 0) / total * 100);
-    return [pctA, 100 - pctA];
-  };
-  const [E, I] = toPct(last.E, last.I);
-  const [S, N] = toPct(last.S, last.N);
-  const [T, F] = toPct(last.T, last.F);
-  const [J, P] = toPct(last.J, last.P);
+  const now = new Date();
+  const dateStr = now.getFullYear() + '/' + 
+    String(now.getMonth() + 1).padStart(2, '0') + '/' + 
+    String(now.getDate()).padStart(2, '0') + ' ' +
+    String(now.getHours()).padStart(2, '0') + ':' + 
+    String(now.getMinutes()).padStart(2, '0');
 
   const payload = {
     "姓名": last.name,
     "部门": last.dept || '',
-    "职位": last.role || '',
-    "人格类型": last.type,
-    "E分值": E,
-    "I分值": I,
-    "S分值": S,
-    "N分值": N,
-    "T分值": T,
-    "F分值": F,
-    "J分值": J,
-    "P分值": P,
-    // 长文本字段添加换行，让飞书表格自动撑高行高
-    "核心优势": (last.strengths || '').replace(/、/g, '\n'),
-    "推荐职业": (last.careers || '').replace(/、/g, '\n'),
-    "人格别称": (mbtiData[last.type].name + '-' + (last.nickname || '')).replace(/·/g, '，'),
-    "人格描述": last.description || '',
-    "潜在挑战": last.weaknesses || '',
-    "职业建议": last.careerAdvice || '',
-    "最佳搭档": (last.bestMatch || '').replace(/、/g, '\n'),
-    "需磨合类型": (last.worstMatch || '').replace(/、/g, '\n'),
-    "成长建议": last.growth || '',
+    "测试时间": dateStr,
+    "人格类型": last.type + ' - ' + (last.typeName || ''),
+    "E分值": last.E || 0,
+    "I分值": last.I || 0,
+    "S分值": last.S || 0,
+    "N分值": last.N || 0,
+    "T分值": last.T || 0,
+    "F分值": last.F || 0,
+    "J分值": last.J || 0,
+    "P分值": last.P || 0,
   };
 
-  fetch(FEISHU_BACKEND + '/submit', {
+  fetch(FEISHU_BACKEND + '/api/submit', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
