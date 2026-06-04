@@ -980,14 +980,6 @@
 
 <script>
 // ============================================================
-//  协作者口令验证 - 带 ?token=xxx 才能看到飞书链接
-// ============================================================
-const ADMIN_TOKEN = 'mbti2025';
-function isAdmin() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get('token') === ADMIN_TOKEN;
-}
-
 // ============================================================
 //  MBTI 题库 (93 题)
 // ============================================================
@@ -1789,17 +1781,6 @@ function generateReport({ type, dimScores, counts }) {
       <div id="feishuMsg" style="margin-top:14px;font-size:14px;font-weight:600;display:none;"></div>
     </div>
 
-    ${isAdmin() ? `
-    <!-- 飞书使用指引（仅协作者可见） -->
-    <div class="feishu-guide">
-      <h3>📌 飞书智能表格已自动同步</h3>
-      <div class="step-list">
-        <div class="step-item"><div class="step-num">✅</div><p>点击上方 <strong>「提交到飞书智能表格」</strong> 按钮，结果将自动写入飞书多维表格</p></div>
-        <div class="step-item"><div class="step-num">📊</div><p>打开飞书，进入 <strong>多维表格</strong> 中的「MBTI员工性格测评结果」即可查看</p></div>
-        <div class="step-item"><div class="step-num">🔗</div><p>表格链接：<a href="https://icn7tuspm5us.feishu.cn/base/Ixv9bL4HkasDCcsYCfnc2MLwnnh" target="_blank">MBTI员工性格测评结果</a></p></div>
-      </div>
-    </div>
-    ` : ''}
 
     <div style="text-align:center;padding:20px 0 40px;">
       <button class="btn btn-outline" onclick="restartTest()">🔄 重新测评</button>
