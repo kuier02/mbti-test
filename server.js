@@ -11,8 +11,14 @@ const url = require('url');
 // 飞书配置
 const APP_ID = 'cli_aa9799f4abfb9bd8';
 const APP_SECRET = '93TOHe8RJcwCRMmYdP8InhsEsEXeqNV6';
-const APP_TOKEN = 'Ixv9bL4HkasDCcsYCfnc2MLwnnh';
-const TABLE_ID = 'tbl98yqaWVZeQXYT';
+
+// 员工表
+const EMPLOYEE_APP_TOKEN = 'Ixv9bL4HkasDCcsYCfnc2MLwnnh';
+const EMPLOYEE_TABLE_ID = 'tbl98yqaWVZeQXYT';
+
+// 候选人表
+const CANDIDATE_APP_TOKEN = 'ZiMBb9frWaMEDksjdPJc7XJon6c';
+const CANDIDATE_TABLE_ID = 'tblydHPeSm9BzI3U';
 
 const PORT = process.env.PORT || 3001;
 
@@ -80,7 +86,7 @@ function proxyFeishu(method, apiPath, reqBody, extraHeaders) {
   });
 }
 
-async function writeToFeishu(recordData) {
+async function writeToFeishu(recordData, appToken, tableId) {
   const token = await getTenantToken();
   const fields = {};
 
@@ -97,7 +103,7 @@ async function writeToFeishu(recordData) {
   const body = JSON.stringify({ fields });
   const result = await proxyFeishu(
     'POST',
-    `/open-apis/bitable/v1/apps/${APP_TOKEN}/tables/${TABLE_ID}/records`,
+    `/open-apis/bitable/v1/apps/${appToken}/tables/${tableId}/records`,
     body,
     { 'Authorization': `Bearer ${token}` }
   );
@@ -140,21 +146,41 @@ const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathname = parsedUrl.pathname;
 
-  // API 路由
+  // API 路由 — 员工
   if (req.method === 'POST' && pathname === '/submit') {
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', async () => {
       try {
         const data = JSON.parse(body);
-        const result = await writeToFeishu(data);
+        const result = await writeToFeishu(data, EMPLOYEE_APP_TOKEN, EMPLOYEE_TABLE_ID);
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify(result));
-        console.log('[OK]', data.姓名, '-', data.人格类型);
+        console.log('[员工]', data.姓名, '-', data.人格类型);
       } catch (e) {
         res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({ success: false, msg: e.message }));
-        console.log('[FAIL]', e.message);
+        console.log('[FAIL-员工]', e.message);
+      }
+    });
+    return;
+  }
+
+  // API 路由 — 面试候选人
+  if (req.method === 'POST' && pathname === '/submit-candidate') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body);
+        const result = await writeToFeishu(data, CANDIDATE_APP_TOKEN, CANDIDATE_TABLE_ID);
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify(result));
+        console.log('[候选人]', data.姓名, '-', data.人格类型);
+      } catch (e) {
+        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ success: false, msg: e.message }));
+        console.log('[FAIL-候选人]', e.message);
       }
     });
     return;

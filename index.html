@@ -864,8 +864,8 @@
   <!-- ===== 欢迎页 ===== -->
   <div class="welcome-screen" id="welcomeScreen">
     <div class="welcome-logo">🧠</div>
-    <h1>MBTI 职场性格测评</h1>
-    <p class="subtitle">深入了解你的性格类型 · 发现职业优势 · 提升团队协作</p>
+    <h1 id="pageH1">MBTI 职场性格测评</h1>
+    <p class="subtitle" id="pageSubtitle">深入了解你的性格类型 · 发现职业优势 · 提升团队协作</p>
 
     <div class="features-grid">
       <div class="feature-card">
@@ -896,13 +896,13 @@
           <input type="text" id="userName" placeholder="请输入您的真实姓名" required>
         </div>
         <div class="form-group">
-          <label>🏢 所在部门</label>
+          <label id="labelDept">🏢 所在部门</label>
           <input type="text" id="userDept" placeholder="如：市场部、技术部">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>💼 职位</label>
+          <label id="labelRole">💼 职位</label>
           <input type="text" id="userRole" placeholder="如：产品经理、工程师">
         </div>
         <div class="form-group">
@@ -980,6 +980,28 @@
 
 <script>
 // ============================================================
+//  模式: 员工版 / 候选人版 (?type=candidate)
+// ============================================================
+const params = new URLSearchParams(window.location.search);
+const PAGE_TYPE = params.get('type') === 'candidate' ? 'candidate' : 'employee';
+const IS_CANDIDATE = PAGE_TYPE === 'candidate';
+const API_SUBMIT = IS_CANDIDATE ? '/submit-candidate' : '/submit';
+const PAGE_TITLE = IS_CANDIDATE ? 'MBTI 面试候选人性格测评' : 'MBTI 职场性格测评';
+const TEXT_HR = IS_CANDIDATE ? '面试官' : 'HR';
+document.title = PAGE_TITLE;
+function applyCandidateUI() {
+  if (IS_CANDIDATE) {
+    document.getElementById('pageH1').textContent = 'MBTI 面试候选人性格测评';
+    document.getElementById('pageSubtitle').textContent = '深入了解候选人的性格特质 · 匹配岗位需求 · 提升招聘质量';
+    document.getElementById('labelDept').textContent = '🎯 应聘岗位';
+    document.getElementById('labelRole').textContent = '🔄 面试轮次';
+    document.getElementById('userDept').placeholder = '如：前端工程师、产品经理';
+    document.getElementById('userRole').placeholder = '如：初试、复试、终试';
+    document.getElementById('resultGuideText').innerHTML = '请点击上方 <strong>「提交到飞书智能表格」</strong> 按钮，面试官将在飞书中收到候选人的测评结果';
+  }
+}
+document.addEventListener('DOMContentLoaded', applyCandidateUI);
+
 // ============================================================
 //  MBTI 题库 (93 题)
 // ============================================================
@@ -1779,7 +1801,7 @@ function generateReport({ type, dimScores, counts }) {
         <button class="btn btn-outline" onclick="copyResult()">📋 复制报告摘要</button>
       </div>
       <div id="feishuMsg" style="margin-top:14px;font-size:14px;font-weight:600;display:none;"></div>
-      <p style="text-align:center;font-size:13px;color:#6B7280;margin-top:12px;">请点击上方 <strong>「提交到飞书智能表格」</strong> 按钮，HR 将在飞书中收到你的测评结果</p>
+      <p style="text-align:center;font-size:13px;color:#6B7280;margin-top:12px;"><span id="resultGuideText">请点击上方 <strong>「提交到飞书智能表格」</strong> 按钮，HR 将在飞书中收到你的测评结果</span></p>
     </div>
 
 
@@ -1811,10 +1833,15 @@ function exportCSV() {
   const allResults = JSON.parse(localStorage.getItem('mbtiResults') || '[]');
   if (allResults.length === 0) { alert('没有测评数据'); return; }
 
-  const headers = ['姓名','部门','职位','年龄段','MBTI类型','人格名称','测评日期','测评时间','用时(分钟)',
-    'E分','I分','S分','N分','T分','F分','J分','P分',
-    'EI倾向%','SN倾向%','TF倾向%','JP倾向%',
-    '核心优势','推荐职业'];
+  const headers = IS_CANDIDATE
+    ? ['姓名','应聘岗位','面试轮次','年龄段','MBTI类型','人格名称','测评日期','测评时间','用时(分钟)',
+      'E分','I分','S分','N分','T分','F分','J分','P分',
+      'EI倾向%','SN倾向%','TF倾向%','JP倾向%',
+      '核心优势','推荐职业']
+    : ['姓名','部门','职位','年龄段','MBTI类型','人格名称','测评日期','测评时间','用时(分钟)',
+      'E分','I分','S分','N分','T分','F分','J分','P分',
+      'EI倾向%','SN倾向%','TF倾向%','JP倾向%',
+      '核心优势','推荐职业'];
 
   const rows = allResults.map(r => [
     r.name, r.dept, r.role, r.age, r.type, r.typeName, r.date, r.time, r.duration,
@@ -1854,7 +1881,7 @@ function copyResult() {
   const data = mbtiData[last.type];
   const text = `【MBTI 测评结果】
 姓名：${last.name}
-部门：${last.dept || '未填写'} | 职位：${last.role || '未填写'}
+${IS_CANDIDATE ? '应聘岗位' : '部门'}：${last.dept || '未填写'} | ${IS_CANDIDATE ? '面试轮次' : '职位'}：${last.role || '未填写'}
 类型：${last.type} - ${data.name}（${data.nickname}）
 测评时间：${last.date} ${last.time}
 
@@ -1940,9 +1967,21 @@ function submitToFeishu(btn) {
 
   const payload = {
     "姓名": last.name,
-    "部门": last.dept || '',
+    "部门": IS_CANDIDATE ? (last.dept || '') : (last.dept || ''),
+    "职位": IS_CANDIDATE ? (last.role || '') : (last.role || ''),
+    "应聘岗位": IS_CANDIDATE ? (last.dept || '') : undefined,
+    "面试轮次": IS_CANDIDATE ? (last.role || '') : undefined,
     "测试时间": dateStr,
     "人格类型": last.type + ' - ' + (last.typeName || ''),
+    "人格别称": last.typeNick || '',
+    "人格描述": last.typeDesc || '',
+    "核心优势": last.strengths || '',
+    "潜在挑战": last.challenges || '',
+    "职业建议": last.careerAdvice || '',
+    "推荐职业": last.bestCareers || '',
+    "成长建议": last.growthTips || '',
+    "最佳搭档": last.bestPartners || '',
+    "需磨合类型": last.needWorkOn || '',
     "E分值": last.E || 0,
     "I分值": last.I || 0,
     "S分值": last.S || 0,
@@ -1953,7 +1992,13 @@ function submitToFeishu(btn) {
     "P分值": last.P || 0,
   };
 
-  fetch(FEISHU_BACKEND + '/api/submit', {
+  // 候选人模式下删除空值字段
+  if (!IS_CANDIDATE) {
+    delete payload['应聘岗位'];
+    delete payload['面试轮次'];
+  }
+
+  fetch(FEISHU_BACKEND + API_SUBMIT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
