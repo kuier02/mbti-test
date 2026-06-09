@@ -995,8 +995,9 @@ function applyCandidateUI() {
     // 标题
     document.getElementById('pageH1').textContent = 'MBTI 面试候选人性格测评';
     document.getElementById('pageSubtitle').textContent = '深入了解候选人的性格特质 · 匹配岗位需求 · 提升招聘质量';
-    // 隐藏"所在部门"
-    document.getElementById('deptGroup').style.display = 'none';
+    // 所在部门 → 毕业院校
+    document.getElementById('labelDept').textContent = '🎓 毕业院校';
+    document.getElementById('userDept').placeholder = '如：北京大学、浙江大学';
     // 职位 → 求职岗位
     document.getElementById('labelRole').textContent = '💼 求职岗位';
     document.getElementById('userRole').placeholder = '如：前端工程师、产品经理';
@@ -1727,7 +1728,7 @@ function generateReport({ type, dimScores, counts }) {
         <div class="dimension-scores">${dimScoreHTML}</div>
         <div style="margin-top:16px;font-size:13px;opacity:0.7;">
           ${dateStr} ${timeStr} · 用时约${duration}分钟
-          ${IS_CANDIDATE ? (user.role ? ' · 求职岗位: ' + user.role : '') : (user.dept ? ' · ' + user.dept : '') + (user.role ? ' · ' + user.role : '')}
+          ${IS_CANDIDATE ? (user.dept ? ' · 毕业院校: ' + user.dept : '') + (user.role ? ' · 求职岗位: ' + user.role : '') : (user.dept ? ' · ' + user.dept : '') + (user.role ? ' · ' + user.role : '')}
         </div>
       </div>
     </div>
@@ -1892,7 +1893,7 @@ function copyResult() {
   const data = mbtiData[last.type];
   const text = `【MBTI 测评结果】
 姓名：${last.name}
-${IS_CANDIDATE ? '求职岗位：' + (last.role || '未填写') : '部门：' + (last.dept || '未填写') + ' | 职位：' + (last.role || '未填写')}
+${IS_CANDIDATE ? '毕业院校：' + (last.dept || '未填写') + ' | 求职岗位：' + (last.role || '未填写') : '部门：' + (last.dept || '未填写') + ' | 职位：' + (last.role || '未填写')}
 类型：${last.type} - ${data.name}（${data.nickname}）
 测评时间：${last.date} ${last.time}
 
@@ -1980,6 +1981,7 @@ function submitToFeishu(btn) {
     "姓名": last.name,
     "部门": IS_CANDIDATE ? undefined : (last.dept || ''),
     "职位": IS_CANDIDATE ? undefined : (last.role || ''),
+    "毕业院校": IS_CANDIDATE ? (last.dept || '') : undefined,
     "求职岗位": IS_CANDIDATE ? (last.role || '') : undefined,
     "年龄": IS_CANDIDATE ? (last.age || '') : (last.age || ''),
     "测试时间": dateStr,
