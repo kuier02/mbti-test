@@ -895,7 +895,7 @@
           <label>👤 您的姓名 *</label>
           <input type="text" id="userName" placeholder="请输入您的真实姓名" required>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="deptGroup">
           <label id="labelDept">🏢 所在部门</label>
           <input type="text" id="userDept" placeholder="如：市场部、技术部">
         </div>
@@ -905,8 +905,8 @@
           <label id="labelRole">💼 职位</label>
           <input type="text" id="userRole" placeholder="如：产品经理、工程师">
         </div>
-        <div class="form-group">
-          <label>🎂 年龄段</label>
+        <div class="form-group" id="ageGroup">
+          <label id="ageLabel">🎂 年龄段</label>
           <select id="userAge">
             <option value="">请选择</option>
             <option value="18-25">18-25岁</option>
@@ -915,6 +915,7 @@
             <option value="36-40">36-40岁</option>
             <option value="41+">41岁以上</option>
           </select>
+          <input type="text" id="userAgeText" placeholder="如：28" style="display:none;">
         </div>
       </div>
     </div>
@@ -991,12 +992,20 @@ const TEXT_HR = IS_CANDIDATE ? '面试官' : 'HR';
 document.title = PAGE_TITLE;
 function applyCandidateUI() {
   if (IS_CANDIDATE) {
+    // 标题
     document.getElementById('pageH1').textContent = 'MBTI 面试候选人性格测评';
     document.getElementById('pageSubtitle').textContent = '深入了解候选人的性格特质 · 匹配岗位需求 · 提升招聘质量';
-    document.getElementById('labelDept').textContent = '🎯 应聘岗位';
-    document.getElementById('labelRole').textContent = '🔄 面试轮次';
-    document.getElementById('userDept').placeholder = '如：前端工程师、产品经理';
-    document.getElementById('userRole').placeholder = '如：初试、复试、终试';
+    // 隐藏"所在部门"
+    document.getElementById('deptGroup').style.display = 'none';
+    // 职位 → 求职岗位
+    document.getElementById('labelRole').textContent = '💼 求职岗位';
+    document.getElementById('userRole').placeholder = '如：前端工程师、产品经理';
+    // 年龄段 → 自由文本年龄
+    document.getElementById('ageLabel').textContent = '🎂 年龄';
+    document.getElementById('userAge').style.display = 'none';
+    document.getElementById('userAgeText').style.display = '';
+    document.getElementById('userAgeText').placeholder = '请填写年龄，如：28';
+    // 结果引导语
     document.getElementById('resultGuideText').innerHTML = '请点击上方 <strong>「提交到飞书智能表格」</strong> 按钮，面试官将在飞书中收到候选人的测评结果';
   }
 }
@@ -1480,7 +1489,9 @@ function startTest() {
   state.user.name = name;
   state.user.dept = document.getElementById('userDept').value.trim();
   state.user.role = document.getElementById('userRole').value.trim();
-  state.user.age = document.getElementById('userAge').value;
+  state.user.age = IS_CANDIDATE
+    ? document.getElementById('userAgeText').value.trim()
+    : document.getElementById('userAge').value;
   state.startTime = new Date();
 
   showScreen('test');
@@ -1716,7 +1727,7 @@ function generateReport({ type, dimScores, counts }) {
         <div class="dimension-scores">${dimScoreHTML}</div>
         <div style="margin-top:16px;font-size:13px;opacity:0.7;">
           ${dateStr} ${timeStr} · 用时约${duration}分钟
-          ${user.dept ? ' · ' + user.dept : ''}${user.role ? ' · ' + user.role : ''}
+          ${IS_CANDIDATE ? (user.role ? ' · 求职岗位: ' + user.role : '') : (user.dept ? ' · ' + user.dept : '') + (user.role ? ' · ' + user.role : '')}
         </div>
       </div>
     </div>
@@ -1834,7 +1845,7 @@ function exportCSV() {
   if (allResults.length === 0) { alert('没有测评数据'); return; }
 
   const headers = IS_CANDIDATE
-    ? ['姓名','应聘岗位','面试轮次','年龄段','MBTI类型','人格名称','测评日期','测评时间','用时(分钟)',
+    ? ['姓名','求职岗位','年龄','MBTI类型','人格名称','测评日期','测评时间','用时(分钟)',
       'E分','I分','S分','N分','T分','F分','J分','P分',
       'EI倾向%','SN倾向%','TF倾向%','JP倾向%',
       '核心优势','推荐职业']
@@ -1881,7 +1892,7 @@ function copyResult() {
   const data = mbtiData[last.type];
   const text = `【MBTI 测评结果】
 姓名：${last.name}
-${IS_CANDIDATE ? '应聘岗位' : '部门'}：${last.dept || '未填写'} | ${IS_CANDIDATE ? '面试轮次' : '职位'}：${last.role || '未填写'}
+${IS_CANDIDATE ? '求职岗位：' + (last.role || '未填写') : '部门：' + (last.dept || '未填写') + ' | 职位：' + (last.role || '未填写')}
 类型：${last.type} - ${data.name}（${data.nickname}）
 测评时间：${last.date} ${last.time}
 
@@ -1967,10 +1978,10 @@ function submitToFeishu(btn) {
 
   const payload = {
     "姓名": last.name,
-    "部门": IS_CANDIDATE ? (last.dept || '') : (last.dept || ''),
-    "职位": IS_CANDIDATE ? (last.role || '') : (last.role || ''),
-    "应聘岗位": IS_CANDIDATE ? (last.dept || '') : undefined,
-    "面试轮次": IS_CANDIDATE ? (last.role || '') : undefined,
+    "部门": IS_CANDIDATE ? undefined : (last.dept || ''),
+    "职位": IS_CANDIDATE ? undefined : (last.role || ''),
+    "求职岗位": IS_CANDIDATE ? (last.role || '') : undefined,
+    "年龄": IS_CANDIDATE ? (last.age || '') : (last.age || ''),
     "测试时间": dateStr,
     "人格类型": last.type + ' - ' + (last.typeName || ''),
     "人格别称": last.typeNick || '',
@@ -1992,11 +2003,10 @@ function submitToFeishu(btn) {
     "P分值": last.P || 0,
   };
 
-  // 候选人模式下删除空值字段
-  if (!IS_CANDIDATE) {
-    delete payload['应聘岗位'];
-    delete payload['面试轮次'];
-  }
+  // 清除 undefined 字段
+  Object.keys(payload).forEach(k => {
+    if (payload[k] === undefined) delete payload[k];
+  });
 
   fetch(FEISHU_BACKEND + API_SUBMIT, {
     method: 'POST',
