@@ -91,9 +91,7 @@ async function writeToFeishu(recordData, appToken, tableId) {
   const fields = {};
 
   for (const [key, value] of Object.entries(recordData)) {
-    if (key === '测试时间') {
-      fields[key] = Date.now();
-    } else if (['E分值', 'I分值', 'S分值', 'N分值', 'T分值', 'F分值', 'J分值', 'P分值'].includes(key)) {
+    if (['E分值', 'I分值', 'S分值', 'N分值', 'T分值', 'F分值', 'J分值', 'P分值'].includes(key)) {
       fields[key] = parseInt(value) || 0;
     } else {
       fields[key] = String(value || '');
