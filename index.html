@@ -1985,6 +1985,26 @@ function submitToFeishu(btn) {
     String(now.getHours()).padStart(2, '0') + ':' + 
     String(now.getMinutes()).padStart(2, '0');
 
+  // 将原始计数转为百分比，确保每对加起来为100
+  const eVal = last.E || 0, iVal = last.I || 0;
+  const sVal = last.S || 0, nVal = last.N || 0;
+  const tVal = last.T || 0, fVal = last.F || 0;
+  const jVal = last.J || 0, pVal = last.P || 0;
+
+  const totalEI = eVal + iVal;
+  const totalSN = sVal + nVal;
+  const totalTF = tVal + fVal;
+  const totalJP = jVal + pVal;
+
+  const eScore = totalEI > 0 ? Math.round(eVal / totalEI * 100) : 0;
+  const iScore = totalEI > 0 ? 100 - eScore : 0;
+  const sScore = totalSN > 0 ? Math.round(sVal / totalSN * 100) : 0;
+  const nScore = totalSN > 0 ? 100 - sScore : 0;
+  const tScore = totalTF > 0 ? Math.round(tVal / totalTF * 100) : 0;
+  const fScore = totalTF > 0 ? 100 - tScore : 0;
+  const jScore = totalJP > 0 ? Math.round(jVal / totalJP * 100) : 0;
+  const pScore = totalJP > 0 ? 100 - jScore : 0;
+
   const payload = {
     "姓名": last.name,
     "部门": IS_CANDIDATE ? undefined : (last.dept || ''),
@@ -2002,14 +2022,14 @@ function submitToFeishu(btn) {
     "成长建议": last.growthTips || '',
     "最佳搭档": last.bestPartners || '',
     "需磨合类型": last.needWorkOn || '',
-    "E分值": last.E || 0,
-    "I分值": last.I || 0,
-    "S分值": last.S || 0,
-    "N分值": last.N || 0,
-    "T分值": last.T || 0,
-    "F分值": last.F || 0,
-    "J分值": last.J || 0,
-    "P分值": last.P || 0,
+    "E分值": eScore,
+    "I分值": iScore,
+    "S分值": sScore,
+    "N分值": nScore,
+    "T分值": tScore,
+    "F分值": fScore,
+    "J分值": jScore,
+    "P分值": pScore,
   };
 
   // 清除 undefined 字段
