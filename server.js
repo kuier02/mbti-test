@@ -20,6 +20,10 @@ const EMPLOYEE_TABLE_ID = 'tbl98yqaWVZeQXYT';
 const CANDIDATE_APP_TOKEN = 'ZiMBb9frWaMEDksjdPJc7XJon6c';
 const CANDIDATE_TABLE_ID = 'tblydHPeSm9BzI3U';
 
+// 招聘需求管理2025表（wiki内嵌bitable）
+const RECRUIT_APP_TOKEN = 'ABtew0V8Gi13c2kZourcr4fUnAg';
+const RECRUIT_TABLE_ID = 'tbl6oGbNkEKAMhfp';
+
 const PORT = process.env.PORT || 3001;
 
 // 缓存 token
@@ -417,6 +421,65 @@ function generateJobMatchAnalysis(mbtiType, jobTitle, scores) {
 }
 
 /**
+ * 同步人岗匹配分析到招聘需求管理2025表
+ * 根据姓名匹配记录并更新MBTI人岗匹配分析字段
+ */
+async function syncToRecruitTable(name, analysisText) {
+  try {
+    const token = await getTenantToken();
+
+    // 1. 在招聘需求管理2025表中按姓名搜索记录
+    const searchBody = JSON.stringify({
+      filter: {
+        conjunction: 'and',
+        conditions: [{
+          field_name: '姓名',
+          operator: 'is',
+          value: [String(name || '').trim()]
+        }]
+      }
+    });
+
+    const searchResult = await proxyFeishu(
+      'POST',
+      `/open-apis/bitable/v1/apps/${RECRUIT_APP_TOKEN}/tables/${RECRUIT_TABLE_ID}/records/search`,
+      searchBody,
+      { 'Authorization': `Bearer ${token}` }
+    );
+
+    if (searchResult.code === 200 && searchResult.body.code === 0) {
+      const items = searchResult.body.data?.items || [];
+      if (items.length > 0) {
+        // 2. 更新找到的记录
+        for (const item of items) {
+          const recordId = item.record_id;
+          const updateBody = JSON.stringify({
+            fields: { 'MBTI人岗匹配分析': analysisText }
+          });
+          const updateResult = await proxyFeishu(
+            'PUT',
+            `/open-apis/bitable/v1/apps/${RECRUIT_APP_TOKEN}/tables/${RECRUIT_TABLE_ID}/records/${recordId}`,
+            updateBody,
+            { 'Authorization': `Bearer ${token}` }
+          );
+          if (updateResult.code === 200 && updateResult.body.code === 0) {
+            console.log('[同步] 已将人岗匹配分析同步到招聘需求管理2025:', name, recordId);
+          } else {
+            console.log('[同步失败]', name, recordId, JSON.stringify(updateResult.body).slice(0, 200));
+          }
+        }
+      } else {
+        console.log('[同步] 招聘需求管理2025中未找到:', name);
+      }
+    } else {
+      console.log('[同步搜索失败]', JSON.stringify(searchResult.body).slice(0, 200));
+    }
+  } catch (e) {
+    console.log('[同步异常]', e.message);
+  }
+}
+
+/**
  * 通用分析（无法匹配到具体岗位类别时使用）
  */
 function generateGenericAnalysis(mbtiType, profile, jobTitle, scores) {
@@ -555,6 +618,14 @@ const server = http.createServer((req, res) => {
         }
 
         const result = await writeToFeishu(data, CANDIDATE_APP_TOKEN, CANDIDATE_TABLE_ID);
+
+        // 自动同步人岗匹配分析到招聘需求管理2025表
+        if (data['人岗匹配分析'] && data['姓名']) {
+          syncToRecruitTable(data['姓名'], data['人岗匹配分析']).catch(e => {
+            console.log('[同步异常-非阻塞]', e.message);
+          });
+        }
+
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify(result));
         console.log('[候选人]', data.姓名, '-', data.人格类型, '- 匹配分析已生成');
